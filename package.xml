@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package>
-  <name>kinect_filter</name>
-  <version>0.1.1</version>
+  <name>pses_kinect_filter</name>
+  <version>0.1.2</version>
   <description>The kinect_filter package</description>
 
   <!-- One maintainer tag required, multiple allowed, one person per tag --> 

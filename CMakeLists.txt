@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(kinect_filter)
+project(pses_kinect_filter)
 
 ## Add support for C++11, supported in ROS Kinetic and newer
 add_definitions(-std=c++11)
