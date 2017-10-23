@@ -9,6 +9,7 @@
 #include <pcl/point_types.h>
 #include <pcl/filters/voxel_grid.h>
 #include <image_transport/image_transport.h>
+#include <opencv2/core/ocl.hpp>
 
 typedef pcl::PointCloud<pcl::PointXYZ> PointCloud;
 typedef pcl::PointXYZ PointXYZ;
@@ -26,16 +27,14 @@ void kinectCallback(const sensor_msgs::Image::ConstPtr& rawImgPtr, sensor_msgs::
       }catch (cv_bridge::Exception& e){
         ROS_ERROR("cv_bridge exception: %s", e.what());
       }
-
-      cv::Mat imgIn = cv_ptr->image;
-      cv::Mat imgIn_copy;
-      imgIn.copyTo(imgIn_copy);
-      cv::medianBlur(imgIn_copy, imgIn_copy, 5);
+        cv::UMat imgIn = cv_ptr->image.getUMat(cv::ACCESS_READ);
+	cv::UMat imgOut;
+	cv::medianBlur(imgIn, imgOut, 5);
 
       cv_bridge::CvImage cvi;
       cvi.header = rawImg->header;
       cvi.encoding = rawImg->encoding;
-      cvi.image = imgIn_copy;
+      cvi.image = imgOut.getMat(cv::ACCESS_READ);
       cvi.toImageMsg(*procImg);
 }
 
