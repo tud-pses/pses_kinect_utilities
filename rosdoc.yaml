@@ -1,0 +1,5 @@
+- builder: doxygen
+  name: C++ API
+  output_dir: c++
+  homepage: https://github.com/tud-pses/pses_kinect_filter
+  file_patterns: '*.c *.cpp *.h *.cc *.hh *.dox'

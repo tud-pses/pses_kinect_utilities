@@ -1,0 +1,21 @@
+actions: []
+authors: Nicolas Acero <aceronicolas@hotmail.com>
+brief: ''
+bugtracker: ''
+depends:
+- catkin
+- roscpp
+- depth_image_proc
+- sensor_msgs
+- image_transport
+- OpenCV
+- cv_bridge
+- pcl_ros
+description: The kinect_filter package
+license: GPLv3
+maintainers: Nicolas Acero <aceronicolas@hotmail.com>, Sebastian Ehmes <sebastian.ehmes@gmx.de>
+msgs: []
+package_type: package
+repo_url: https://github.com/tud-pses/pses_kinect_filter
+srvs: []
+url: https://github.com/tud-pses/pses_kinect_filter/wiki
