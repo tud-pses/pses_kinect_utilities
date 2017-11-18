@@ -2,7 +2,7 @@
 <launch>
   <node pkg="nodelet" type="nodelet" name="kinect2" args="manager" output="screen"/>
 
-  <node pkg="kinect_filter" type="kinect_filter" name="kinect_filter" output="screen">
+  <node pkg="pses_kinect_filter" type="kinect_filter" name="kinect_filter" output="screen">
 	<param name="depth_image_topic" type="str" value="/kinect2/sd/image_depth_rect" />
 	<param name="output_depth_image_topic" type="str" value="/kinect_filtered/depth_image" />
 	<param name="camera_info_topic" type="str" value="/kinect2/sd/camera_info" />
