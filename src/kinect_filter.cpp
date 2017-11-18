@@ -31,23 +31,21 @@ typedef pses_kinect_filter::KinectFilterConfig FilterConfig;
 /**
  * @brief This function will be called whenever a node parameter is changed over dynamic reconfigure.
  * @param[in] inputConfig Reference to the object containing the new configuration of the filter.
- * @param[out] outConfig Reference to the object to store the new configuration of the filter.
+ * @param[out] outConfig Pointer to the object to store the new configuration of the filter.
  * @param[in] level This parameter is not used by this callback and can be ignored.
 */
-void dynReconfCallback(FilterConfig &inputConfig, FilterConfig &outConfig, uint32_t level) {
-  outConfig = inputConfig;
+void dynReconfCallback(FilterConfig &inputConfig, FilterConfig* outConfig, uint32_t level) {
+  *outConfig = inputConfig;
   ROS_INFO("Reconfigured kinect filter params");
 }
 
 /**
  * @brief This function will be called whenever a depth image is received over the corresponding ROS topic.
  * @param[in] rawImgPtr Pointer to the received depth image.
- * @param[out] rawImg .
  * @param[out] procImg This parameter is not used by this callback and can be ignored.
- * @param[in] filterConfig Reference to the object containing the configuration of the filter.
+ * @param[in] filterConfig Pointer to the object containing the configuration of the filter.
 */
-void kinectCallback(const sensor_msgs::Image::ConstPtr& rawImgPtr, sensor_msgs::Image* rawImg, sensor_msgs::Image* procImg, FilterConfig& filterConfig){
-    //*rawImg = *rawImgPtr;
+void kinectCallback(const sensor_msgs::Image::ConstPtr& rawImgPtr, sensor_msgs::Image* procImg, FilterConfig* filterConfig){
     cv_bridge::CvImagePtr cv_ptr;
     try{
        cv_ptr = cv_bridge::toCvCopy(*rawImgPtr, rawImgPtr->encoding);
@@ -58,7 +56,7 @@ void kinectCallback(const sensor_msgs::Image::ConstPtr& rawImgPtr, sensor_msgs::
       // Apply a median filter using the OpenCL libraries of OpenCV
       cv::UMat imgIn = cv_ptr->image.getUMat(cv::ACCESS_READ);
       cv::UMat imgOut;
-      cv::medianBlur(imgIn, imgOut, filterConfig.median_kernel_size);
+      cv::medianBlur(imgIn, imgOut, filterConfig->median_kernel_size);
 
       // Convert the data back to a ROS Image and store it in procImg
       cv_bridge::CvImage cvi;
@@ -71,21 +69,21 @@ void kinectCallback(const sensor_msgs::Image::ConstPtr& rawImgPtr, sensor_msgs::
 /**
  * @brief This function will be called whenever a node parameter is changed over dynamic reconfigure.
  * @param[in] inputConfig Reference to the object containing the new configuration of the filter.
- * @param[out] outConfig Reference to the object to store the new configuration of the filter.
+ * @param[out] outConfig Pointer to the object to store the new configuration of the filter.
  * @param[in] level This parameter is not used by this callback and can be ignored.
 */
-void pointCloudCallback(const PointCloud::ConstPtr& rawPointCloud, PointCloud::Ptr cloudFiltered, FilterConfig& filterConfig) {
+void pointCloudCallback(const PointCloud::ConstPtr& rawPointCloud, PointCloud::Ptr cloudFiltered, FilterConfig* filterConfig) {
   PointCloud::Ptr cloud (new PointCloud);
   std::string tf_frame;
   *cloud = *rawPointCloud;
   pcl::VoxelGrid<PointXYZ> vox;
   vox.setInputCloud(cloud);
   // The leaf size is more or less the size of voxels. Note that these values affect what a good threshold value would be.
-  vox.setLeafSize(filterConfig.leaf_size, filterConfig.leaf_size,filterConfig.leaf_size);
+  vox.setLeafSize(filterConfig->leaf_size, filterConfig->leaf_size,filterConfig->leaf_size);
   // This limits the overall volume of points. Being "far away" points considered as irrelevant.
-  vox.setFilterLimits(filterConfig.min_filter_limit, filterConfig.max_filter_limit);
+  vox.setFilterLimits(filterConfig->min_filter_limit, filterConfig->max_filter_limit);
   // The line below is perhaps the most important as it reduces ghost points.
-  vox.setMinimumPointsNumberPerVoxel(filterConfig.min_points_per_voxel);
+  vox.setMinimumPointsNumberPerVoxel(filterConfig->min_points_per_voxel);
   vox.filter(*cloudFiltered);
   ros::param::param<std::string>("~tf_frame", tf_frame, "base_link");
   cloudFiltered->header.frame_id = tf_frame;
@@ -94,7 +92,7 @@ void pointCloudCallback(const PointCloud::ConstPtr& rawPointCloud, PointCloud::P
 /**
  * @brief This function will be called whenever a node parameter is changed over dynamic reconfigure.
  * @param[in] inputConfig Reference to the object containing the new configuration of the filter.
- * @param[out] outConfig Reference to the object to store the new configuration of the filter.
+ * @param[out] outConfig Pointer to the object to store the new configuration of the filter.
  * @param[in] level This parameter is not used by this callback and can be ignored.
 */
 void infoCallback(const sensor_msgs::CameraInfo::ConstPtr& cameraInfo, sensor_msgs::CameraInfo* output) {
@@ -112,7 +110,6 @@ int main(int argc, char **argv){
 
     // Variables declarations/inits
     sensor_msgs::Image procImg;
-    sensor_msgs::Image rawImg;
     sensor_msgs::CameraInfo cameraInfo;
     PointCloud::Ptr cloudFiltered (new PointCloud);
     std::string depth_image_topic;
@@ -123,7 +120,7 @@ int main(int argc, char **argv){
     // Init dynamic reconfigure
     dynamic_reconfigure::Server<FilterConfig> reconfigureServer;
     dynamic_reconfigure::Server<FilterConfig>::CallbackType f;
-    f = boost::bind(&dynReconfCallback, _1, filterConfig, _2);
+    f = boost::bind(&dynReconfCallback, _1, &filterConfig, _2);
     reconfigureServer.setCallback(f);
 
     if (!ros::param::get("~depth_image_topic", depth_image_topic))
@@ -140,10 +137,10 @@ int main(int argc, char **argv){
 
     ros::param::param<std::string>("~output_depth_image_topic", output_depth_image_topic, "kinect2/depth_filtered");
 
-    ros::Subscriber kinectImg = nh.subscribe<sensor_msgs::Image>(depth_image_topic, 1, boost::bind(kinectCallback, _1, &rawImg, &procImg, filterConfig));
+    ros::Subscriber kinectImg = nh.subscribe<sensor_msgs::Image>(depth_image_topic, 1, boost::bind(kinectCallback, _1, &procImg, &filterConfig));
     ros::Subscriber kinectInfo = nh.subscribe<sensor_msgs::CameraInfo>(camera_info_topic, 1, boost::bind(infoCallback, _1, &cameraInfo));
     image_transport::CameraPublisher kinectDepthPub = it.advertiseCamera(output_depth_image_topic, 1);
-    ros::Subscriber kinectCloud = nh.subscribe<PointCloud>("/kinect_filter/points", 1, boost::bind(pointCloudCallback, _1, cloudFiltered, filterConfig));
+    ros::Subscriber kinectCloud = nh.subscribe<PointCloud>("/kinect_filter/points", 1, boost::bind(pointCloudCallback, _1, cloudFiltered, &filterConfig));
     ros::Publisher kinectCloudProc = nh.advertise<PointCloud> ("/kinect_filter/points_filtered", 1);
 
 
