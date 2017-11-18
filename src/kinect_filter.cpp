@@ -31,11 +31,13 @@ typedef pses_kinect_filter::KinectFilterConfig FilterConfig;
 /**
  * @brief This function will be called whenever a node parameter is changed over dynamic reconfigure.
  * @param[in] inputConfig Reference to the object containing the new configuration of the filter.
- * @param[out] outConfig Pointer to the object to store the new configuration of the filter.
+ * @param[out] outConfig Pointer to the object where the new configuration of the filter has to be stored.
  * @param[in] level This parameter is not used by this callback and can be ignored.
 */
 void dynReconfCallback(FilterConfig &inputConfig, FilterConfig* outConfig, uint32_t level) {
   *outConfig = inputConfig;
+  // If an even kernel size was selected, add 1 to make it odd.
+  if (outConfig->median_kernel_size % 2 == 0) outConfig->median_kernel_size += 1;
   ROS_INFO("Reconfigured kinect filter params");
 }
 
@@ -67,10 +69,10 @@ void kinectCallback(const sensor_msgs::Image::ConstPtr& rawImgPtr, sensor_msgs::
 }
 
 /**
- * @brief This function will be called whenever a node parameter is changed over dynamic reconfigure.
- * @param[in] inputConfig Reference to the object containing the new configuration of the filter.
- * @param[out] outConfig Pointer to the object to store the new configuration of the filter.
- * @param[in] level This parameter is not used by this callback and can be ignored.
+ * @brief This function will be called whenever a point cloud message is received over its corresponding ROS topic.
+ * @param[in] rawPointCloud Pointer to the received point cloud.
+ * @param[out] cloudFiltered Pointer to the object where the filtered point cloud has to be stored.
+ * @param[in] filterConfig Pointer to the object containing the configuration of the filter.
 */
 void pointCloudCallback(const PointCloud::ConstPtr& rawPointCloud, PointCloud::Ptr cloudFiltered, FilterConfig* filterConfig) {
   PointCloud::Ptr cloud (new PointCloud);
@@ -90,13 +92,16 @@ void pointCloudCallback(const PointCloud::ConstPtr& rawPointCloud, PointCloud::P
 }
 
 /**
- * @brief This function will be called whenever a node parameter is changed over dynamic reconfigure.
- * @param[in] inputConfig Reference to the object containing the new configuration of the filter.
- * @param[out] outConfig Pointer to the object to store the new configuration of the filter.
- * @param[in] level This parameter is not used by this callback and can be ignored.
+ * @brief This function will be once called after receving the first camera info message. Then the camera info
+ * topic will be unsuscribed from this node.
+ * @param[in] cameraInfo Pointer to the object containing the new camera info message.
+ * @param[out] output Pointer to the object where the camera info has to be stored.
+ * @param[in] infoSubscriber Pointer to the camera info subscriber.
 */
-void infoCallback(const sensor_msgs::CameraInfo::ConstPtr& cameraInfo, sensor_msgs::CameraInfo* output) {
+void infoCallback(const sensor_msgs::CameraInfo::ConstPtr& cameraInfo, sensor_msgs::CameraInfo* output, ros::Subscriber* infoSubscriber) {
   *output = *cameraInfo;
+  // Stop subscribing the camera info topic after the getting the first camera info message.
+  infoSubscriber->shutdown();
 }
 
 int main(int argc, char **argv){
@@ -138,7 +143,7 @@ int main(int argc, char **argv){
     ros::param::param<std::string>("~output_depth_image_topic", output_depth_image_topic, "kinect2/depth_filtered");
 
     ros::Subscriber kinectImg = nh.subscribe<sensor_msgs::Image>(depth_image_topic, 1, boost::bind(kinectCallback, _1, &procImg, &filterConfig));
-    ros::Subscriber kinectInfo = nh.subscribe<sensor_msgs::CameraInfo>(camera_info_topic, 1, boost::bind(infoCallback, _1, &cameraInfo));
+    ros::Subscriber kinectInfo = nh.subscribe<sensor_msgs::CameraInfo>(camera_info_topic, 1, boost::bind(infoCallback, _1, &cameraInfo, &kinectInfo));
     image_transport::CameraPublisher kinectDepthPub = it.advertiseCamera(output_depth_image_topic, 1);
     ros::Subscriber kinectCloud = nh.subscribe<PointCloud>("/kinect_filter/points", 1, boost::bind(pointCloudCallback, _1, cloudFiltered, &filterConfig));
     ros::Publisher kinectCloudProc = nh.advertise<PointCloud> ("/kinect_filter/points_filtered", 1);

@@ -3,6 +3,7 @@ authors: Nicolas Acero <aceronicolas@hotmail.com>
 brief: ''
 bugtracker: ''
 depends:
+- dynamic_reconfigure
 - catkin
 - roscpp
 - depth_image_proc
