@@ -11,7 +11,8 @@
   <node pkg="nodelet" type="nodelet" name="kinect2_points"
 	args="load depth_image_proc/point_cloud_xyz $(arg kinect2_nodelet_manager)" respawn="true" output="screen">
     <remap from="image_rect"        to="kinect_filter/depth_image"/>
-    <remap from="camera_info"        to="kinect_filter/camera_info"/>
+    <remap from="camera_info"       to="kinect_filter/camera_info"/>
+    <remap from="points"            to="kinect_filter/points"/>	
   </node>
 
 </launch>
