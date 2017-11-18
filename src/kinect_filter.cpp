@@ -73,10 +73,10 @@ void kinectCallback(const sensor_msgs::Image::ConstPtr& rawImgPtr, sensor_msgs::
  * @param[in] rawPointCloud Pointer to the received point cloud.
  * @param[out] cloudFiltered Pointer to the object where the filtered point cloud has to be stored.
  * @param[in] filterConfig Pointer to the object containing the configuration of the filter.
+ * @param[in] tf_frame Pointer to the string with the name of the tf frame of the point cloud.
 */
-void pointCloudCallback(const PointCloud::ConstPtr& rawPointCloud, PointCloud::Ptr cloudFiltered, FilterConfig* filterConfig) {
+void pointCloudCallback(const PointCloud::ConstPtr& rawPointCloud, PointCloud::Ptr cloudFiltered, FilterConfig* filterConfig, std::string* tf_frame) {
   PointCloud::Ptr cloud (new PointCloud);
-  std::string tf_frame;
   *cloud = *rawPointCloud;
   pcl::VoxelGrid<PointXYZ> vox;
   vox.setInputCloud(cloud);
@@ -87,8 +87,7 @@ void pointCloudCallback(const PointCloud::ConstPtr& rawPointCloud, PointCloud::P
   // The line below is perhaps the most important as it reduces ghost points.
   vox.setMinimumPointsNumberPerVoxel(filterConfig->min_points_per_voxel);
   vox.filter(*cloudFiltered);
-  ros::param::param<std::string>("~tf_frame", tf_frame, "base_link");
-  cloudFiltered->header.frame_id = tf_frame;
+  cloudFiltered->header.frame_id = *tf_frame;
 }
 
 /**
@@ -120,6 +119,7 @@ int main(int argc, char **argv){
     std::string depth_image_topic;
     std::string camera_info_topic;
     std::string output_depth_image_topic;
+    std::string tf_frame;
     FilterConfig filterConfig;
 
     // Init dynamic reconfigure
@@ -141,11 +141,12 @@ int main(int argc, char **argv){
     }
 
     ros::param::param<std::string>("~output_depth_image_topic", output_depth_image_topic, "kinect2/depth_filtered");
+    ros::param::param<std::string>("~tf_frame", tf_frame, "base_link");
 
     ros::Subscriber kinectImg = nh.subscribe<sensor_msgs::Image>(depth_image_topic, 1, boost::bind(kinectCallback, _1, &procImg, &filterConfig));
     ros::Subscriber kinectInfo = nh.subscribe<sensor_msgs::CameraInfo>(camera_info_topic, 1, boost::bind(infoCallback, _1, &cameraInfo, &kinectInfo));
     image_transport::CameraPublisher kinectDepthPub = it.advertiseCamera(output_depth_image_topic, 1);
-    ros::Subscriber kinectCloud = nh.subscribe<PointCloud>("/kinect_filter/points", 1, boost::bind(pointCloudCallback, _1, cloudFiltered, &filterConfig));
+    ros::Subscriber kinectCloud = nh.subscribe<PointCloud>("/kinect_filter/points", 1, boost::bind(pointCloudCallback, _1, cloudFiltered, &filterConfig, &tf_frame));
     ros::Publisher kinectCloudProc = nh.advertise<PointCloud> ("/kinect_filter/points_filtered", 1);
 
 
