@@ -1,7 +1,7 @@
 /**
  * @file "kinect_filter.cpp"
  * @brief kinect_filter node. Applies a median filter to the kinect depth image
- * and after that a voxelgrid based filter to the its point cloud. This node publishes
+ * and after that a voxelgrid based filter to its point cloud. This node publishes
  * a topic with the filtered point cloud.
  *
 */
