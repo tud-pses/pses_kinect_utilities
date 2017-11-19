@@ -19,6 +19,8 @@
 #include <opencv2/core/ocl.hpp>
 #include <dynamic_reconfigure/server.h>
 #include <pses_kinect_filter/KinectFilterConfig.h>
+#include <pses_kinect_filter/opencltest.h>
+#include <pses_kinect_filter/ocl_depth_image_to_laser_scan.h>
 
 typedef pcl::PointCloud<pcl::PointXYZ> PointCloud;
 typedef pcl::PointXYZ PointXYZ;
@@ -108,7 +110,15 @@ int main(int argc, char **argv){
     // Init ROS
     ros::init(argc, argv, "kinect_filter");
     ros::NodeHandle nh;
+    ros::Time t = ros::Time::now();
+    int testsize = 500000;
+    ocl_test(testsize);
+    ROS_INFO_STREAM("GPU Test took: " <<(ros::Time::now()-t).toSec());
+    t = ros::Time::now();
+    cpu_test(testsize);
+    ROS_INFO_STREAM("CPU Test took: " <<(ros::Time::now()-t).toSec());
 
+    /*
     // Init image transport
     image_transport::ImageTransport it(nh);
 
@@ -158,7 +168,7 @@ int main(int argc, char **argv){
     ros::spinOnce();
     loop_rate.sleep();
 }
-
+    */
     return 0;
 
 }
