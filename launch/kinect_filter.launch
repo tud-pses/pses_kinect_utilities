@@ -2,8 +2,6 @@
 <launch>
   <arg name="kinect2_nodelet_manager" default="kinect2"/>
 
-  <node pkg="tf" type="static_transform_publisher" name="tf_kinect_publisher" args="0 0 0 0 -1.570796 1.570796 kinect2_link base_link 100"/>
-
   <node pkg="pses_kinect_filter" type="kinect_filter" name="kinect_filter" output="screen">
 	<param name="depth_image_topic" type="str" value="/kinect2/sd/image_depth_rect" />
 	<param name="output_depth_image_topic" type="str" value="/kinect_filter/depth_image" />
@@ -17,7 +15,11 @@
     <remap from="camera_info"       to="kinect_filter/camera_info"/>
     <remap from="points"            to="kinect_filter/points"/>
   </node>
-<!-- push pointcloud_to_laserscan nodelet into sensor's nodelet manager -->
+
+<!-- Uncomment this section if you want to get a laserscan from the filtered point cloud. The default topic for the resulting laserscan is /kinect_filter/scan
+
+	 <node pkg="tf" type="static_transform_publisher" name="tf_kinect_publisher" args="0 0 0 0 -1.570796 1.570796 kinect2_link base_link 100"/>
+
 	<node pkg="nodelet" type="nodelet" name="pointcloud_to_laserscan" args="load pointcloud_to_laserscan/pointcloud_to_laserscan_nodelet $(arg kinect2_nodelet_manager)">
 
 	<remap from="cloud_in" to="kinect_filter/points_filtered"/>
@@ -36,5 +38,6 @@
       use_inf: true
       concurrency_level: 4
   </rosparam>
-	</node>
+  </node>
+-->
 </launch>
