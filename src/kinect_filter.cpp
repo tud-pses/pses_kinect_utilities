@@ -47,24 +47,23 @@ void dynReconfCallback(FilterConfig &inputConfig, FilterConfig* outConfig, uint3
  * @param[out] procImg This parameter is not used by this callback and can be ignored.
  * @param[in] filterConfig Pointer to the object containing the configuration of the filter.
 */
-void kinectCallback(const sensor_msgs::Image::ConstPtr& rawImgPtr, sensor_msgs::Image* procImg, FilterConfig* filterConfig){
-    cv_bridge::CvImagePtr cv_ptr;
+void kinectCallback(const sensor_msgs::Image::ConstPtr& rawImgPtr, sensor_msgs::Image* rawImg, sensor_msgs::Image* procImg, FilterConfig* filterConfig){
+  *rawImg = *rawImgPtr;
+  cv_bridge::CvImagePtr cv_ptr;
     try{
-       cv_ptr = cv_bridge::toCvCopy(*rawImgPtr, rawImgPtr->encoding);
+       cv_ptr = cv_bridge::toCvCopy(*rawImg, rawImg->encoding);
       }catch (cv_bridge::Exception& e){
         ROS_ERROR("cv_bridge exception: %s", e.what());
       }
 
       // Apply a median filter using the OpenCL libraries of OpenCV
-      cv::UMat imgIn = cv_ptr->image.getUMat(cv::ACCESS_READ);
-      cv::UMat imgOut;
-      cv::medianBlur(imgIn, imgOut, filterConfig->median_kernel_size);
+      cv::medianBlur(cv_ptr->image.getUMat(cv::ACCESS_READ), cv_ptr->image.getUMat(cv::ACCESS_WRITE), filterConfig->median_kernel_size);
 
       // Convert the data back to a ROS Image and store it in procImg
       cv_bridge::CvImage cvi;
-      cvi.header = rawImgPtr->header;
-      cvi.encoding = rawImgPtr->encoding;
-      cvi.image = imgOut.getMat(cv::ACCESS_READ);
+      cvi.header = rawImg->header;
+      cvi.encoding = rawImg->encoding;
+      cvi.image = cv_ptr->image;
       cvi.toImageMsg(*procImg);
 }
 
@@ -114,6 +113,7 @@ int main(int argc, char **argv){
 
     // Variables declarations/inits
     sensor_msgs::Image procImg;
+    sensor_msgs::Image rawImg;
     sensor_msgs::CameraInfo cameraInfo;
     PointCloud::Ptr cloudFiltered (new PointCloud);
     std::string depth_image_topic;
@@ -143,7 +143,7 @@ int main(int argc, char **argv){
     ros::param::param<std::string>("~output_depth_image_topic", output_depth_image_topic, "kinect2/depth_filtered");
     ros::param::param<std::string>("~tf_frame", tf_frame, "base_link");
 
-    ros::Subscriber kinectImg = nh.subscribe<sensor_msgs::Image>(depth_image_topic, 1, boost::bind(kinectCallback, _1, &procImg, &filterConfig));
+    ros::Subscriber kinectImg = nh.subscribe<sensor_msgs::Image>(depth_image_topic, 1, boost::bind(kinectCallback, _1, &rawImg, &procImg, &filterConfig));
     ros::Subscriber kinectInfo = nh.subscribe<sensor_msgs::CameraInfo>(camera_info_topic, 1, boost::bind(infoCallback, _1, &cameraInfo, &kinectInfo));
     image_transport::CameraPublisher kinectDepthPub = it.advertiseCamera(output_depth_image_topic, 1);
     ros::Subscriber kinectCloud = nh.subscribe<PointCloud>("/kinect_filter/points", 1, boost::bind(pointCloudCallback, _1, cloudFiltered, &filterConfig, &tf_frame));
@@ -154,7 +154,7 @@ int main(int argc, char **argv){
     while(ros::ok()) {
 
     kinectDepthPub.publish(procImg, cameraInfo, ros::Time::now());
-    kinectCloudProc.publish(cloudFiltered);
+    //kinectCloudProc.publish(cloudFiltered);
     ros::spinOnce();
     loop_rate.sleep();
 }
