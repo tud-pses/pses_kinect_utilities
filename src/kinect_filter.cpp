@@ -24,10 +24,6 @@ typedef pcl::PointCloud<pcl::PointXYZ> PointCloud;
 typedef pcl::PointXYZ PointXYZ;
 typedef pses_kinect_filter::KinectFilterConfig FilterConfig;
 
-// TODOs:
-//     *Documentation
-//     *Try it with navigation stack and evaluate performance
-
 /**
  * @brief This function will be called whenever a node parameter is changed over dynamic reconfigure.
  * @param[in] inputConfig Reference to the object containing the new configuration of the filter.
