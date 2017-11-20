@@ -40,7 +40,8 @@ void dynReconfCallback(FilterConfig &inputConfig, FilterConfig* outConfig, uint3
 /**
  * @brief This function will be called whenever a depth image is received over the corresponding ROS topic.
  * @param[in] rawImgPtr Pointer to the received depth image.
- * @param[out] procImg This parameter is not used by this callback and can be ignored.
+ * @param[out] rawImg Pointer to store the received depth image.
+ * @param[out] procImg Pointer to store the filtered depth image.
  * @param[in] filterConfig Pointer to the object containing the configuration of the filter.
 */
 void kinectCallback(const sensor_msgs::Image::ConstPtr& rawImgPtr, sensor_msgs::Image* rawImg, sensor_msgs::Image* procImg, FilterConfig* filterConfig){
