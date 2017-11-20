@@ -71,9 +71,9 @@ Functions</h2></td></tr>
 <tr class="memitem:a3b90a5e3c14ab129c2cd0e4bb14f4bc8"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="kinect__filter_8cpp.html#a3b90a5e3c14ab129c2cd0e4bb14f4bc8">infoCallback</a> (const sensor_msgs::CameraInfo::ConstPtr &amp;cameraInfo, sensor_msgs::CameraInfo *output, ros::Subscriber *infoSubscriber)</td></tr>
 <tr class="memdesc:a3b90a5e3c14ab129c2cd0e4bb14f4bc8"><td class="mdescLeft">&#160;</td><td class="mdescRight">This function will be once called after receving the first camera info message. Then the camera info topic will be unsuscribed from this node.  <a href="#a3b90a5e3c14ab129c2cd0e4bb14f4bc8">More...</a><br /></td></tr>
 <tr class="separator:a3b90a5e3c14ab129c2cd0e4bb14f4bc8"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa4f8c739b50888151eaf7c0f21559894"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="kinect__filter_8cpp.html#aa4f8c739b50888151eaf7c0f21559894">kinectCallback</a> (const sensor_msgs::Image::ConstPtr &amp;rawImgPtr, sensor_msgs::Image *procImg, <a class="el" href="kinect__filter_8cpp.html#afae59b5891c5eac716ec30f2962b09c8">FilterConfig</a> *filterConfig)</td></tr>
-<tr class="memdesc:aa4f8c739b50888151eaf7c0f21559894"><td class="mdescLeft">&#160;</td><td class="mdescRight">This function will be called whenever a depth image is received over the corresponding ROS topic.  <a href="#aa4f8c739b50888151eaf7c0f21559894">More...</a><br /></td></tr>
-<tr class="separator:aa4f8c739b50888151eaf7c0f21559894"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad63d6bde7adf76807b4b81f518cfc60c"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="kinect__filter_8cpp.html#ad63d6bde7adf76807b4b81f518cfc60c">kinectCallback</a> (const sensor_msgs::Image::ConstPtr &amp;rawImgPtr, sensor_msgs::Image *rawImg, sensor_msgs::Image *procImg, <a class="el" href="kinect__filter_8cpp.html#afae59b5891c5eac716ec30f2962b09c8">FilterConfig</a> *filterConfig)</td></tr>
+<tr class="memdesc:ad63d6bde7adf76807b4b81f518cfc60c"><td class="mdescLeft">&#160;</td><td class="mdescRight">This function will be called whenever a depth image is received over the corresponding ROS topic.  <a href="#ad63d6bde7adf76807b4b81f518cfc60c">More...</a><br /></td></tr>
+<tr class="separator:ad63d6bde7adf76807b4b81f518cfc60c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3c04138a5bfe5d72780bb7e82a18e627"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="kinect__filter_8cpp.html#a3c04138a5bfe5d72780bb7e82a18e627">main</a> (int argc, char **argv)</td></tr>
 <tr class="separator:a3c04138a5bfe5d72780bb7e82a18e627"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4f34197986997b7a2aee13c8a03e3825"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="kinect__filter_8cpp.html#a4f34197986997b7a2aee13c8a03e3825">pointCloudCallback</a> (const PointCloud::ConstPtr &amp;rawPointCloud, PointCloud::Ptr cloudFiltered, <a class="el" href="kinect__filter_8cpp.html#afae59b5891c5eac716ec30f2962b09c8">FilterConfig</a> *filterConfig, std::string *tf_frame)</td></tr>
@@ -168,7 +168,7 @@ Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="kinect__filter_8cpp_source.html#l00037">37</a> of file <a class="el" href="kinect__filter_8cpp_source.html">kinect_filter.cpp</a>.</p>
+<p>Definition at line <a class="el" href="kinect__filter_8cpp_source.html#l00033">33</a> of file <a class="el" href="kinect__filter_8cpp_source.html">kinect_filter.cpp</a>.</p>
 
 </div>
 </div>
@@ -212,11 +212,11 @@ Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="kinect__filter_8cpp_source.html#l00100">100</a> of file <a class="el" href="kinect__filter_8cpp_source.html">kinect_filter.cpp</a>.</p>
+<p>Definition at line <a class="el" href="kinect__filter_8cpp_source.html#l00095">95</a> of file <a class="el" href="kinect__filter_8cpp_source.html">kinect_filter.cpp</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="aa4f8c739b50888151eaf7c0f21559894"></a>
+<a class="anchor" id="ad63d6bde7adf76807b4b81f518cfc60c"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
@@ -225,6 +225,12 @@ Functions</h2></td></tr>
           <td>(</td>
           <td class="paramtype">const sensor_msgs::Image::ConstPtr &amp;&#160;</td>
           <td class="paramname"><em>rawImgPtr</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">sensor_msgs::Image *&#160;</td>
+          <td class="paramname"><em>rawImg</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -256,7 +262,7 @@ Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="kinect__filter_8cpp_source.html#l00050">50</a> of file <a class="el" href="kinect__filter_8cpp_source.html">kinect_filter.cpp</a>.</p>
+<p>Definition at line <a class="el" href="kinect__filter_8cpp_source.html#l00046">46</a> of file <a class="el" href="kinect__filter_8cpp_source.html">kinect_filter.cpp</a>.</p>
 
 </div>
 </div>
@@ -284,7 +290,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="kinect__filter_8cpp_source.html#l00106">106</a> of file <a class="el" href="kinect__filter_8cpp_source.html">kinect_filter.cpp</a>.</p>
+<p>Definition at line <a class="el" href="kinect__filter_8cpp_source.html#l00101">101</a> of file <a class="el" href="kinect__filter_8cpp_source.html">kinect_filter.cpp</a>.</p>
 
 </div>
 </div>
@@ -335,7 +341,7 @@ Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="kinect__filter_8cpp_source.html#l00078">78</a> of file <a class="el" href="kinect__filter_8cpp_source.html">kinect_filter.cpp</a>.</p>
+<p>Definition at line <a class="el" href="kinect__filter_8cpp_source.html#l00073">73</a> of file <a class="el" href="kinect__filter_8cpp_source.html">kinect_filter.cpp</a>.</p>
 
 </div>
 </div>
@@ -345,7 +351,7 @@ Functions</h2></td></tr>
 <hr size="1"><div style="align: right;">
 <a href="https://github.com/tud-pses/pses_kinect_filter">pses_kinect_filter</a><br />
 Author(s): Nicolas Acero <aceronicolas@hotmail.com></br />
-<small>autogenerated on Sat Nov 18 2017 22:02:29</small>
+<small>autogenerated on Mon Nov 20 2017 02:20:33</small>
 </div>
 </body>
 </html>
