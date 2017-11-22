@@ -14,9 +14,14 @@ find_package(catkin REQUIRED COMPONENTS
   image_transport
   sensor_msgs
   dynamic_reconfigure
+  image_geometry
 )
 
 find_package(OpenCV)
+
+find_package(OpenCL REQUIRED)
+include_directories(${OpenCL_INCLUDE_DIRS})
+link_directories(${OpenCL_LIBRARY})
 
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
@@ -121,13 +126,14 @@ catkin_package(
 ## Your package locations should be listed before other locations
 # include_directories(include)
 include_directories(
+  include
   ${catkin_INCLUDE_DIRS}
 )
 
-## Declare a C++ library
-# add_library(${PROJECT_NAME}
-#   src/${PROJECT_NAME}/kinect_filter.cpp
-# )
+add_library(filter_lib
+  src/depth_image_to_pcl.cpp
+  src/ocl_library_wrapper.cpp
+  )
 
 ## Declare a C++ executable
 ## With catkin_make all packages are built within a single CMake context
@@ -150,7 +156,8 @@ add_dependencies(kinect_filter ${PROJECT_NAME}_gencfg)
 # add_dependencies(${PROJECT_NAME}_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 ## Specify libraries to link a library or executable target against
-target_link_libraries(kinect_filter ${catkin_LIBRARIES} ${opencv_LIBRARIES} ${PCL_LIBRARIES})
+target_link_libraries(filter_lib ${catkin_LIBRARIES} ${opencv_LIBRARIES} ${PCL_LIBRARIES} ${OpenCL_LIBRARY})
+target_link_libraries(kinect_filter filter_lib ${catkin_LIBRARIES} ${opencv_LIBRARIES} ${PCL_LIBRARIES} ${OpenCL_LIBRARY})
 
 #############
 ## Install ##
