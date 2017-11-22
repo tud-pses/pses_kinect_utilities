@@ -121,6 +121,9 @@ void infoCallback(const sensor_msgs::CameraInfo::ConstPtr& cameraInfo, sensor_ms
   md.height = (cl_uint) 424;
   md.n_pixels = (cl_uint) 512*424;
   md.depth_scaling = (cl_float) 0.001f;
+  md.invalid_depth = (cl_uint) 0;
+  md.max_depth = (cl_float) 0.0f;
+  md.NaN = std::numeric_limits<float>::quiet_NaN();
   transform tf;
   tf.cx = (cl_float) model.cx();
   tf.cy = (cl_float) model.cy();
@@ -222,7 +225,7 @@ int main(int argc, char **argv){
     ros::param::param<std::string>("~tf_frame", tf_frame, "base_link");
 
     //ros::Subscriber kinectImg = nh.subscribe<sensor_msgs::Image>(depth_image_topic, 1, boost::bind(kinectCallback, _1, &procImg, &filterConfig));
-    ros::Subscriber filteredImg = nh.subscribe<sensor_msgs::Image>("/kinect_filter/depth_image", 1, boost::bind(depthImageCallback, _1, cloud, pcl_conversion));
+    ros::Subscriber filteredImg = nh.subscribe<sensor_msgs::Image>("/kinect2/sd/image_depth_rect", 1, boost::bind(depthImageCallback, _1, cloud, pcl_conversion));
     ros::Subscriber kinectInfo = nh.subscribe<sensor_msgs::CameraInfo>(camera_info_topic, 1, boost::bind(infoCallback, _1, &cameraInfo, &kinectInfo, pcl_conversion));
     //image_transport::CameraPublisher kinectDepthPub = it.advertiseCamera(output_depth_image_topic, 1);
     ros::Publisher transformedCloud = nh.advertise<PointCloud>("/kinect_filter/points", 1);
@@ -233,7 +236,7 @@ int main(int argc, char **argv){
     ros::Rate loop_rate(35);
     while(ros::ok()) {
 
-    kinectDepthPub.publish(procImg, cameraInfo, ros::Time::now());
+    //kinectDepthPub.publish(procImg, cameraInfo, ros::Time::now());
     transformedCloud.publish(cloud);
     //kinectCloudProc.publish(cloudFiltered);
     ros::spinOnce();

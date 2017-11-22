@@ -14,6 +14,9 @@ typedef struct{
   cl_uint height;
   cl_uint n_pixels;
   cl_float depth_scaling;
+  cl_uint invalid_depth;
+  cl_float max_depth;
+  cl_float NaN;
 }meta_data;
 
 typedef struct{

@@ -52,7 +52,7 @@ void DepthImageToPCL::init_buffers()
         "Cl components or program kernel have not yet been initilized!");
   buffers.push_back(
       create_ocl_buffer<unsigned short>(context, md.n_pixels, R_ACCESS));
-  buffers.push_back(create_ocl_buffer<float>(context, md.n_pixels * 3, RW_ACCESS));
+  buffers.push_back(create_ocl_buffer<float>(context, md.n_pixels * 4, RW_ACCESS));
   kernel->setArg(0,*buffers[0]);
   kernel->setArg(1,*buffers[1]);
   kernel->setArg(2,md);
@@ -71,7 +71,7 @@ DepthImageToPCL::convert_to_pcl(const sensor_msgs::Image::ConstPtr img_in)
                              cl::NullRange);
   queue->finish();
   read_buffer();
-
+  std::cout<<"pt0: "<<cloud.points[0]<<"  pt100: "<<cloud.points[100]<<std::endl;
   return std::make_shared<point_cloud>(cloud);
 }
 
