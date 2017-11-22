@@ -6,8 +6,88 @@
 
 #include <iostream>
 #include <CL/cl2.hpp>
+#include <ros/ros.h>
+#include <pses_kinect_filter/ocl_library_wrapper.h>
 
-int ocltest() {
+void ocl_test(int n, const std::string& path)
+{
+  //Device and Kernel setup
+  device_ptr device;
+  context_ptr context;
+  program_ptr program;
+  queue_ptr queue;
+  kernel_ptr k;
+  string_ptr kernel_def;
+  //kernel_def = std::make_shared<std::string>(kernel_code);
+  try{
+    device = get_ocl_default_device();
+    context = get_ocl_context(device);
+    kernel_def = load_kernel_definition(path);
+    program =
+        build_ocl_program(device, context, kernel_def);
+    queue = create_ocl_command_queue(context, device);
+    k = create_ocl_kernel(program, "test2");
+  }catch(std::exception& e){
+    std::cout<<"An Error occured during OCL set up: "<<e.what()<<std::endl;
+    return;
+  }
+
+  // initalize buffers and kernel
+  buffer_ptr a = create_ocl_buffer<int>(context, n, RW_ACCESS);
+  buffer_ptr b = create_ocl_buffer<int>(context, n, RW_ACCESS);
+  buffer_ptr c = create_ocl_buffer<int>(context, n, RW_ACCESS);
+
+  k->setArg(0,*a);
+  k->setArg(1,*b);
+  k->setArg(2,*c);
+  k->setArg(3,n);
+
+  // set and push data to device
+  std::vector<int> A(n), B(n), C(n);
+  for (int i = 0; i < n; i++)
+  {
+    A[i] = 1;
+    B[i] = 1;
+  }
+  write_ocl_buffer(queue, a, A);
+  write_ocl_buffer(queue, b, B);
+
+  ros::Time t = ros::Time::now();
+  queue->enqueueNDRangeKernel(*k, cl::NullRange, cl::NDRange(n/10),
+                             cl::NullRange);
+  queue->finish();
+  ROS_INFO_STREAM(
+      "GPU Kernel execution took: " << (ros::Time::now() - t).toSec());
+
+  // read result from GPU to here
+  read_ocl_buffer(queue, c, C);
+
+  std::cout << "Result from GPU: " << C[n - 1] << std::endl;
+
+  // shut down
+  queue->flush();
+}
+
+void cpu_test(int n)
+{
+  int A[n], B[n], C[n];
+  for (int i = 0; i < n; i++)
+  {
+    A[i] = 1;
+    B[i] = 1;
+  }
+  ros::Time t = ros::Time::now();
+  for (int i = 0; i < n; i++)
+  {
+    C[i] = A[i] + B[i] + i;
+  }
+  ROS_INFO_STREAM(
+      "CPU Kernel execution took: " << (ros::Time::now() - t).toSec());
+
+  std::cout << "Result from CPU: " << C[n - 1] << std::endl;
+}
+
+int ocltest_sanity() {
     // get all platforms (drivers), e.g. NVIDIA
     std::vector<cl::Platform> all_platforms;
     cl::Platform::get(&all_platforms);
@@ -54,7 +134,7 @@ int ocltest() {
         "       stop  = ratio * (ID + 1);"
         ""
         "       for (int i=start; i<stop; i++)"
-        "           C[i] = A[i] + B[i];"
+        "           C[i] = A[i] + B[i] + i;"
         "   }";
     sources.push_back({kernel_code.c_str(), kernel_code.length()});
 
@@ -66,7 +146,7 @@ int ocltest() {
 
     // apparently OpenCL only likes arrays ...
     // N holds the number of elements in the vectors we want to add
-    int N[1] = {100};
+    int N[1] = {500000};
     int n = N[0];
 
     // create buffers on device (allocate space on GPU)
@@ -77,8 +157,8 @@ int ocltest() {
     // create things on here (CPU)
     int A[n], B[n];
     for (int i=0; i<n; i++) {
-        A[i] = i;
-        B[i] = n - i - 1;
+        A[i] = 1;
+        B[i] = 1;
     }
     // create a queue (a queue of commands that the GPU will execute)
     cl::CommandQueue queue(context, default_device);
@@ -100,11 +180,7 @@ int ocltest() {
     int C[n];
     // read result from GPU to here
     queue.enqueueReadBuffer(buffer_C, CL_TRUE, 0, sizeof(int)*n, C);
-    std::cout << "result: {";
-    for (int i=0; i<n; i++) {
-        std::cout << C[i] << " ";
-    }
-    std::cout << "}" << std::endl;
+    std::cout << "Result from GPU (sanity): " << C[n - 1] << std::endl;
 
     return 0;
 }
