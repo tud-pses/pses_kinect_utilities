@@ -20,8 +20,20 @@
 #include <dynamic_reconfigure/server.h>
 #include <pses_kinect_filter/KinectFilterConfig.h>
 
+/**
+ * @typedef pcl::PointCloud<pcl::PointXYZ> PointCloud
+ * @brief shortcut for the XYZ point cloud of the pcl library
+*/
 typedef pcl::PointCloud<pcl::PointXYZ> PointCloud;
+/**
+ * @typedef pcl::PointXYZ PointXYZ
+ * @brief shortcut for XYZ points of the pcl library
+*/
 typedef pcl::PointXYZ PointXYZ;
+/**
+ * @typedef pses_kinect_filter::KinectFilterConfig FilterConfig
+ * @brief shortcut for the filter configuration
+*/
 typedef pses_kinect_filter::KinectFilterConfig FilterConfig;
 
 /**
@@ -52,7 +64,6 @@ void kinectCallback(const sensor_msgs::Image::ConstPtr& rawImgPtr, sensor_msgs::
       }catch (cv_bridge::Exception& e){
         ROS_ERROR("cv_bridge exception: %s", e.what());
       }
-
       // Apply a median filter using the OpenCL libraries of OpenCV
       cv::medianBlur(cv_ptr->image.getUMat(cv::ACCESS_READ), cv_ptr->image.getUMat(cv::ACCESS_WRITE), filterConfig->median_kernel_size);
 
@@ -151,7 +162,7 @@ int main(int argc, char **argv){
     while(ros::ok()) {
 
     kinectDepthPub.publish(procImg, cameraInfo, ros::Time::now());
-    //kinectCloudProc.publish(cloudFiltered);
+    kinectCloudProc.publish(cloudFiltered);
     ros::spinOnce();
     loop_rate.sleep();
 }
