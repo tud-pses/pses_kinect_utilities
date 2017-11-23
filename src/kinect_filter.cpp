@@ -185,7 +185,7 @@ int main(int argc, char **argv){
     sensor_msgs::Image procImg;
     sensor_msgs::Image rawImg;
     sensor_msgs::CameraInfo cameraInfo;
-    //PointCloud::Ptr cloudFiltered (new PointCloud);
+    PointCloud::Ptr cloudFiltered (new PointCloud);
     //PointCloud::Ptr cloud (new PointCloud);
     PointCloudMsg::Ptr cloud(new PointCloudMsg);
     std::string depth_image_topic;
@@ -216,20 +216,20 @@ int main(int argc, char **argv){
     ros::param::param<std::string>("~tf_frame", tf_frame, "base_link");
 
     //ros::Subscriber kinectImg = nh.subscribe<sensor_msgs::Image>(depth_image_topic, 1, boost::bind(kinectCallback, _1, &procImg, &filterConfig));
-    ros::Subscriber filteredImg = nh.subscribe<sensor_msgs::Image>("/kinect2/sd/image_depth_rect", 1, boost::bind(depthImageCallback, _1, cloud, pcl_conversion));
+    ros::Subscriber filteredImg = nh.subscribe<sensor_msgs::Image>(output_depth_image_topic, 1, boost::bind(depthImageCallback, _1, cloud, pcl_conversion));
     ros::Subscriber kinectInfo = nh.subscribe<sensor_msgs::CameraInfo>(camera_info_topic, 1, boost::bind(infoCallback, _1, &cameraInfo, &kinectInfo, pcl_conversion));
-    //image_transport::CameraPublisher kinectDepthPub = it.advertiseCamera(output_depth_image_topic, 1);
+    image_transport::CameraPublisher kinectDepthPub = it.advertiseCamera(output_depth_image_topic, 1);
     ros::Publisher transformedCloud = nh.advertise<PointCloudMsg>("/kinect_filter/points", 1);
-    //ros::Subscriber kinectCloud = nh.subscribe<PointCloud>("/kinect_filter/points", 1, boost::bind(pointCloudCallback, _1, cloudFiltered, &filterConfig, &tf_frame));
-    //ros::Publisher kinectCloudProc = nh.advertise<PointCloud> ("/kinect_filter/points_filtered", 1);
+    ros::Subscriber kinectCloud = nh.subscribe<PointCloud>("/kinect_filter/points", 1, boost::bind(pointCloudCallback, _1, cloudFiltered, &filterConfig, &tf_frame));
+    ros::Publisher kinectCloudProc = nh.advertise<PointCloud> ("/kinect_filter/points_filtered", 1);
 
 
     ros::Rate loop_rate(35);
     while(ros::ok()) {
 
-    //kinectDepthPub.publish(procImg, cameraInfo, ros::Time::now());
+    kinectDepthPub.publish(procImg, cameraInfo, ros::Time::now());
     transformedCloud.publish(cloud);
-    //kinectCloudProc.publish(cloudFiltered);
+    kinectCloudProc.publish(cloudFiltered);
     ros::spinOnce();
     loop_rate.sleep();
 }
