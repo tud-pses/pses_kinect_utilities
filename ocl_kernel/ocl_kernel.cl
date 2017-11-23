@@ -61,12 +61,14 @@ void kernel depth_to_pcl(global const unsigned short* img, global pixel* pcl,
       pcl[i].x=md.NaN;
       pcl[i].y=md.NaN;
       pcl[i].z=md.NaN;
+      pcl[i].w=1.0f;
       continue;
     }
 
     pcl[i].x=(u(i,md.width) - tf.cx)*z/tf.fx;
     pcl[i].y=(md.height - v(i,md.width) - tf.cy)*z/tf.fy;
     pcl[i].z=z;
+    pcl[i].w=1.0f;
 
 
 

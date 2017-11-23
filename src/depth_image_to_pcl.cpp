@@ -67,11 +67,10 @@ DepthImageToPCL::convert_to_pcl(const sensor_msgs::Image::ConstPtr img_in)
     throw std::runtime_error("Cl components, program kernel or buffers have "
                              "not yet been initilized!");
   fill_buffer(img_in->data.data());
-  queue->enqueueNDRangeKernel(*kernel, cl::NullRange, cl::NDRange(md.n_pixels/100),
+  queue->enqueueNDRangeKernel(*kernel, cl::NullRange, cl::NDRange(md.n_pixels/10),
                              cl::NullRange);
   queue->finish();
   read_buffer();
-  std::cout<<"pt0: "<<cloud.points[0]<<"  pt100: "<<cloud.points[100]<<std::endl;
   return std::make_shared<point_cloud>(cloud);
 }
 
