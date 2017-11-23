@@ -20,10 +20,11 @@
 #include <opencv2/core/ocl.hpp>
 #include <dynamic_reconfigure/server.h>
 #include <pses_kinect_filter/KinectFilterConfig.h>
-//#include <pses_kinect_filter/opencltest.h>
 #include <pses_kinect_filter/depth_image_to_pcl.h>
+#include <sensor_msgs/point_cloud2_iterator.h>
 
 typedef pcl::PointCloud<pcl::PointXYZ> PointCloud;
+typedef sensor_msgs::PointCloud2 PointCloudMsg;
 typedef pcl::PointXYZ PointXYZ;
 typedef pses_kinect_filter::KinectFilterConfig FilterConfig;
 typedef std::shared_ptr<DepthImageToPCL> depth_conv_ptr;
@@ -70,14 +71,28 @@ void kinectCallback(const sensor_msgs::Image::ConstPtr& rawImgPtr, sensor_msgs::
       cvi.toImageMsg(*procImg);
 }
 
-void depthImageCallback(const sensor_msgs::Image::ConstPtr& rawImgPtr, PointCloud::Ptr cloud, depth_conv_ptr pcl_conversion){
+void depthImageCallback(const sensor_msgs::Image::ConstPtr& rawImgPtr, PointCloudMsg::Ptr cloud, depth_conv_ptr pcl_conversion){
+  cloud->header = rawImgPtr->header;
+  cloud->is_dense = false;
+  cloud->is_bigendian = false;
+  cloud->height = 424;
+  cloud->width = 512;
+  sensor_msgs::PointCloud2Modifier pcd_mod(*cloud);
+  pcd_mod.setPointCloud2FieldsByString(1, "xyz");
+
   try{
-    *cloud = *pcl_conversion->convert_to_pcl(rawImgPtr);
+    //*cloud = *pcl_conversion->convert_to_pcl(rawImgPtr);
+    point_cloud_ptr pc= pcl_conversion->convert_to_pcl(rawImgPtr);
+    pcl::toROSMsg(*pc, *cloud);
   }catch(std::exception& e){
     ROS_ERROR_STREAM("An error occured during depth to pcl conversion! "<<e.what());
   }
-  cloud->header.stamp = ros::Time::now().toNSec()/1000;
-  cloud->header.frame_id = "base_link";
+  //cloud->header = rawImgPtr->header.stamp.toNSec()/1000.0;
+  //cloud->header = rawImgPtr->header.frame_id;
+  //cloud->is_dense = false;
+  cloud->header.frame_id = "base_footprint";
+  cloud->is_dense = false;
+
 }
 
 /**
@@ -120,6 +135,9 @@ void infoCallback(const sensor_msgs::CameraInfo::ConstPtr& cameraInfo, sensor_ms
   md.height = (cl_uint) 424;
   md.n_pixels = (cl_uint) 512*424;
   md.depth_scaling = (cl_float) 0.001f;
+  md.invalid_depth = (cl_uint) 0;
+  md.max_depth = (cl_float) 0.0f;
+  md.NaN = std::numeric_limits<float>::quiet_NaN();
   transform tf;
   tf.cx = (cl_float) model.cx();
   tf.cy = (cl_float) model.cy();
@@ -156,32 +174,7 @@ int main(int argc, char **argv){
     ros::NodeHandle nh;
     std::string path;
     ros::param::get("~cl_file_path", path);
-    /*
-    ros::Time t = ros::Time::now();
-    int testsize = 500000;
-    ocltest_sanity();
-    try{
-      ocl_test(testsize, path);
-    }catch(std::exception& e){
-      ROS_INFO_STREAM("An error occured during GPU test: "<<e.what());
-    }
 
-    ROS_INFO_STREAM("GPU Test took: " <<(ros::Time::now()-t).toSec());
-    t = ros::Time::now();
-    cpu_test(testsize);
-    ROS_INFO_STREAM("CPU Test took: " <<(ros::Time::now()-t).toSec());
-    */
-
-    /*
-    PointCloud pc;
-    pc.insert(pc.begin(),PointXYZ(1.0, 2.0, 3.0));
-    ROS_INFO_STREAM("Point: x"<<pc[0].x<<" y"<<pc[0].y<<" z"<<pc[0].z);
-    ROS_INFO_STREAM("Point: x"<<pc.points[0].x<<" y"<<pc.points[0].y<<" z"<<pc.points[0].z);
-    ROS_INFO_STREAM("Point: x"<<pc.points.data()[0].x<<" y"<<pc.points.data()[0].y<<" z"<<pc.points.data()[0].z);
-    ROS_INFO_STREAM("Point size "<< sizeof(pc.points.data()[0]));
-    xyz_* st = reinterpret_cast<xyz_*>(&pc.points.data()[0]);
-    ROS_INFO_STREAM("Point: x"<<st->x<<" y"<<st->y<<" z"<<st->z<<" ?"<<st->w);
-    */
     // PCL Conversion Object
     DepthImageToPCL ditpcl;
     depth_conv_ptr pcl_conversion = std::make_shared<DepthImageToPCL>(ditpcl);
@@ -193,7 +186,8 @@ int main(int argc, char **argv){
     sensor_msgs::Image rawImg;
     sensor_msgs::CameraInfo cameraInfo;
     //PointCloud::Ptr cloudFiltered (new PointCloud);
-    PointCloud::Ptr cloud (new PointCloud);
+    //PointCloud::Ptr cloud (new PointCloud);
+    PointCloudMsg::Ptr cloud(new PointCloudMsg);
     std::string depth_image_topic;
     std::string camera_info_topic;
     std::string output_depth_image_topic;
@@ -222,10 +216,10 @@ int main(int argc, char **argv){
     ros::param::param<std::string>("~tf_frame", tf_frame, "base_link");
 
     //ros::Subscriber kinectImg = nh.subscribe<sensor_msgs::Image>(depth_image_topic, 1, boost::bind(kinectCallback, _1, &procImg, &filterConfig));
-    ros::Subscriber filteredImg = nh.subscribe<sensor_msgs::Image>("/kinect_filter/depth_image", 1, boost::bind(depthImageCallback, _1, cloud, pcl_conversion));
+    ros::Subscriber filteredImg = nh.subscribe<sensor_msgs::Image>("/kinect2/sd/image_depth_rect", 1, boost::bind(depthImageCallback, _1, cloud, pcl_conversion));
     ros::Subscriber kinectInfo = nh.subscribe<sensor_msgs::CameraInfo>(camera_info_topic, 1, boost::bind(infoCallback, _1, &cameraInfo, &kinectInfo, pcl_conversion));
     //image_transport::CameraPublisher kinectDepthPub = it.advertiseCamera(output_depth_image_topic, 1);
-    ros::Publisher transformedCloud = nh.advertise<PointCloud>("/kinect_filter/points", 1);
+    ros::Publisher transformedCloud = nh.advertise<PointCloudMsg>("/kinect_filter/points", 1);
     //ros::Subscriber kinectCloud = nh.subscribe<PointCloud>("/kinect_filter/points", 1, boost::bind(pointCloudCallback, _1, cloudFiltered, &filterConfig, &tf_frame));
     //ros::Publisher kinectCloudProc = nh.advertise<PointCloud> ("/kinect_filter/points_filtered", 1);
 
@@ -233,7 +227,7 @@ int main(int argc, char **argv){
     ros::Rate loop_rate(35);
     while(ros::ok()) {
 
-    kinectDepthPub.publish(procImg, cameraInfo, ros::Time::now());
+    //kinectDepthPub.publish(procImg, cameraInfo, ros::Time::now());
     transformedCloud.publish(cloud);
     //kinectCloudProc.publish(cloudFiltered);
     ros::spinOnce();
