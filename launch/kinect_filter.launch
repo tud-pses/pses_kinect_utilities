@@ -1,42 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <launch>
-  <arg name="kinect2_nodelet_manager" default="kinect2"/>
+  <!-- Arguments -->
+  <arg name="nodelet_manager_name" default="kinect2f"/>
+  <arg name="start_manager"     default="true"/>
+  <!-- end argument list -->
 
-  <node pkg="pses_kinect_filter" type="kinect_filter" name="kinect_filter" output="screen">
-	<param name="depth_image_topic" type="str" value="/kinect2/sd/image_depth_rect" />
-	<param name="output_depth_image_topic" type="str" value="/kinect_filter/depth_image" />
-	<param name="camera_info_topic" type="str" value="/kinect2/sd/camera_info" />
-	<param name="tf_frame" type="str" value="kinect2_link" />
-        <param name="cl_file_path" type="str" value="$(find pses_kinect_filter)/ocl_kernel/ocl_kernel.cl" />
+  <node pkg="nodelet" type="nodelet" name="$(arg nodelet_manager_name)" args="manager"
+        if="$(arg start_manager)" output="screen"/>
+  <node pkg="nodelet" type="nodelet" name="kinect2_median_filter"
+        args="load pses_kinect_utilities/median_filter $(arg nodelet_manager_name)" respawn="true" output="screen">
   </node>
-<!--
-  <node pkg="nodelet" type="nodelet" name="kinect2_points"
-        args="load depth_image_proc/point_cloud_xyz $(arg kinect2_nodelet_manager)" respawn="true" output="screen">
-    <remap from="image_rect"        to="kinect_filter/depth_image"/>
-    <remap from="camera_info"       to="kinect_filter/camera_info"/>
-    <remap from="points"            to="kinect_filter/points"/>
-  </node>
-
- push pointcloud_to_laserscan nodelet into sensor's nodelet manager
-	<node pkg="nodelet" type="nodelet" name="pointcloud_to_laserscan" args="load pointcloud_to_laserscan/pointcloud_to_laserscan_nodelet $(arg kinect2_nodelet_manager)">
-
-	<remap from="cloud_in" to="kinect_filter/points_filtered"/>
-	<remap from="scan" to="kinect_filter/scan"/>
-	<rosparam>
-      target_frame: base_link
-      transform_tolerance: 0.01
-      min_height: 0.0
-      max_height: 0.40
-      angle_min: -0.6108652382
-      angle_max: 0.6108652382
-      angle_increment: 0.0087 # M_PI/360.0
-      scan_time: 0.3333
-      range_min: 0.55
-      range_max: 12.0
-      use_inf: true
-      concurrency_level: 4
-  </rosparam>
-	</node>
--->
 
 </launch>

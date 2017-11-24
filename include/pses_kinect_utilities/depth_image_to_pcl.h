@@ -1,15 +1,19 @@
 #ifndef DEPTH_IMAGE_TO_PCL_H
 #define DEPTH_IMAGE_TO_PCL_H
 
-#include <pses_kinect_filter/ocl_library_wrapper.h>
+#include <pses_kinect_utilities/ocl_library_wrapper.h>
 #include <pcl_ros/point_cloud.h>
 #include <pcl/point_types.h>
 #include <sensor_msgs/Image.h>
 
-typedef pcl::PointCloud<pcl::PointXYZ> point_cloud;
-typedef std::shared_ptr<point_cloud> point_cloud_ptr;
+typedef pcl::PointCloud<pcl::PointXYZ> PointCloud;
+typedef std::shared_ptr<PointCloud> PointCloudPtr;
 
-typedef struct{
+namespace pses_kinect_utilities
+{
+
+typedef struct
+{
   cl_uint width;
   cl_uint height;
   cl_uint n_pixels;
@@ -17,16 +21,18 @@ typedef struct{
   cl_uint invalid_depth;
   cl_float max_depth;
   cl_float NaN;
-}meta_data;
+} meta_data;
 
-typedef struct{
+typedef struct
+{
   cl_float cx;
   cl_float cy;
   cl_float fx;
   cl_float fy;
-}transform;
+} transform;
 
-class DepthImageToPCL{
+class DepthImageToPCL
+{
 public:
   DepthImageToPCL();
   DepthImageToPCL(const meta_data& md, const transform& tf);
@@ -36,7 +42,7 @@ public:
   void init_CL(const std::string& kernel_file);
   void program_kernel(const std::string& kernel_function);
   void init_buffers();
-  point_cloud_ptr convert_to_pcl(const sensor_msgs::Image::ConstPtr rawImgPtr);
+  PointCloudPtr convert_to_pcl(const sensor_msgs::Image::ConstPtr rawImgPtr);
 
 private:
   device_ptr device;
@@ -47,7 +53,7 @@ private:
   kernel_ptr kernel;
   std::vector<buffer_ptr> buffers;
 
-  point_cloud cloud;
+  PointCloud cloud;
 
   bool cl_init;
   bool kernel_init;
@@ -58,8 +64,8 @@ private:
 
   void fill_buffer(const unsigned char* image);
   void read_buffer();
-
 };
 
+} // namespace pses_kinect_utilities
 
 #endif // DEPTH_IMAGE_TO_PCL_H

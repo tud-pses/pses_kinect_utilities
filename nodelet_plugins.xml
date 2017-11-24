@@ -1,0 +1,14 @@
+<library path="lib/libpses_kinect_utilities">
+
+    <class name="pses_kinect_utilities/median_filter" type="pses_kinect_utilities::MedianFilterNodelet" base_class_type="nodelet::Nodelet">
+    <description>
+    Nodelet that applies a median filter to the depth image.
+    </description>
+    </class>
+
+    <class name="pses_kinect_utilities/point_cloud_xyz" type="pses_kinect_utilities::PointCloudXYZNodelet" base_class_type="nodelet::Nodelet">
+    <description>
+    Nodelet that transforms a depth image into a XYZ point cloud.
+    </description>
+
+</library>

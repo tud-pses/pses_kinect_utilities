@@ -1,4 +1,7 @@
-#include <pses_kinect_filter/ocl_library_wrapper.h>
+#include <pses_kinect_utilities/ocl_library_wrapper.h>
+
+namespace pses_kinect_utilities
+{
 
 device_ptr get_ocl_default_device()
 {
@@ -44,14 +47,17 @@ context_ptr get_ocl_context(device_ptr device)
   return std::make_shared<cl::Context>(context);
 }
 
-string_ptr load_kernel_definition(const std::string& path) {
+string_ptr load_kernel_definition(const std::string& path)
+{
   std::ifstream file(path);
   std::stringstream ss = std::stringstream();
   char buffer[65500];
-  while(file.getline(buffer, 65500)){
-    ss<<buffer<<"\n";
+  while (file.getline(buffer, 65500))
+  {
+    ss << buffer << "\n";
   }
-  std::cout<<std::endl<<ss.str()<<std::endl;
+  std::cout << std::endl
+            << ss.str() << std::endl;
   return std::make_shared<std::string>(ss.str());
 }
 
@@ -84,3 +90,4 @@ kernel_ptr create_ocl_kernel(program_ptr program,
   cl::Kernel kernel = cl::Kernel(*program, program_name.c_str());
   return std::make_shared<cl::Kernel>(kernel);
 }
+} // namespace pses_kinect_utilities
