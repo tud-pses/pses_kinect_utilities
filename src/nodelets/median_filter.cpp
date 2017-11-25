@@ -70,6 +70,7 @@ void MedianFilterNodelet::depthCb(
 {
   cv_bridge::CvImagePtr cv_ptr;
   sensor_msgs::CameraInfo cam_info = *info_msg;
+  uint8_t kernel_size = config_.kernel_size;
 
   try
   {
@@ -80,19 +81,26 @@ void MedianFilterNodelet::depthCb(
     NODELET_ERROR("cv_bridge exception: %s", e.what());
   }
 
+  if (cv_ptr->image.depth() > CV_8U && config_.kernel_size > 5)
+  {
+    kernel_size = 5;
+    NODELET_WARN("INVALID KERNEL SIZE: You can only use a maximum kernel size "
+                 "of 5 for the median filter when using images encoded with "
+                 "more than 8 bits pro pixel. Using kernel size 5 instead...");
+  }
+
   // Check if opencl is available
   if (cv::ocl::haveOpenCL())
   {
     // Apply a median filter using the OpenCL libraries of OpenCV
     cv::medianBlur(cv_ptr->image.getUMat(cv::ACCESS_READ),
-                   cv_ptr->image.getUMat(cv::ACCESS_WRITE),
-                   config_.kernel_size);
+                   cv_ptr->image.getUMat(cv::ACCESS_WRITE), kernel_size);
   }
 
   else // CPU variant
   {
     // Apply a median filter using OpenCV
-    cv::medianBlur(cv_ptr->image, cv_ptr->image, config_.kernel_size);
+    cv::medianBlur(cv_ptr->image, cv_ptr->image, kernel_size);
   }
 
   // Convert the data back to a ROS Image and store it in procImg
