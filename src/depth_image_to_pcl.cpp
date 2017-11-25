@@ -10,7 +10,7 @@ DepthImageToPCL::DepthImageToPCL()
   buffer_init = false;
 }
 
-DepthImageToPCL::DepthImageToPCL(const meta_data& md, const transform& tf)
+DepthImageToPCL::DepthImageToPCL(const MetaData& md, const Transform& tf)
     : md(md), tf(tf)
 {
   cl_init = false;
@@ -19,8 +19,8 @@ DepthImageToPCL::DepthImageToPCL(const meta_data& md, const transform& tf)
   cloud = PointCloud(md.width, md.height);
 }
 
-void DepthImageToPCL::setMetaData(const meta_data& md) { this->md = md; }
-void DepthImageToPCL::setTFData(const transform& tf) { this->tf = tf; }
+void DepthImageToPCL::setMetaData(const MetaData& md) { this->md = md; }
+void DepthImageToPCL::setTFData(const Transform& tf) { this->tf = tf; }
 
 void DepthImageToPCL::initCloud() { cloud = PointCloud(md.width, md.height); }
 

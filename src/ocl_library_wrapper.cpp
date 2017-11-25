@@ -56,8 +56,7 @@ string_ptr load_kernel_definition(const std::string& path)
   {
     ss << buffer << "\n";
   }
-  std::cout << std::endl
-            << ss.str() << std::endl;
+
   return std::make_shared<std::string>(ss.str());
 }
 

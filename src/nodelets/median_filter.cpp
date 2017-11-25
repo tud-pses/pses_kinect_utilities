@@ -3,7 +3,6 @@
 #include <pluginlib/class_list_macros.h>
 #include <sensor_msgs/Image.h>
 #include <cv_bridge/cv_bridge.h>
-#include <sensor_msgs/image_encodings.h>
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/core/ocl.hpp>
 
@@ -11,17 +10,17 @@
 PLUGINLIB_EXPORT_CLASS(pses_kinect_utilities::MedianFilterNodelet,
                        nodelet::Nodelet);
 
-namespace enc = sensor_msgs::image_encodings;
-
 namespace pses_kinect_utilities
 {
 
 void MedianFilterNodelet::onInit()
 {
-  NODELET_DEBUG("Initializing nodelet...");
+  NODELET_DEBUG("Initializing median filter nodelet...");
 
   ros::NodeHandle& private_nh = getPrivateNodeHandle();
+  ros::NodeHandle& nh = getNodeHandle();
   current_frame_.reset(new sensor_msgs::Image);
+  it_.reset(new image_transport::ImageTransport(nh));
 
   // Read parameters
   private_nh.param("queue_size", queue_size_, 1);
@@ -31,13 +30,17 @@ void MedianFilterNodelet::onInit()
   private_nh.param<std::string>("output_topic", output_topic_,
                                 "/kinect_utilities/depth_image");
 
-  // Monitor whether anyone is subscribed to the output
-  ros::SubscriberStatusCallback connect_cb =
+  // Monitor whether anyone is subscribed to the output image or to the camera
+  // info
+  image_transport::SubscriberStatusCallback connect_cb =
+      boost::bind(&MedianFilterNodelet::connectCb, this);
+  ros::SubscriberStatusCallback connect_info_cb =
       boost::bind(&MedianFilterNodelet::connectCb, this);
   // Make sure we don't enter connectCb() between advertising and assigning to
   boost::lock_guard<boost::mutex> lock(connect_mutex_);
-  pub_filtered_image_ = nh_.advertise<sensor_msgs::Image>(
-      output_topic_, 1, connect_cb, connect_cb);
+  pub_filtered_image_ =
+      it_->advertiseCamera(output_topic_, 1, connect_cb, connect_cb,
+                           connect_info_cb, connect_info_cb);
 }
 
 void MedianFilterNodelet::connectCb()
@@ -45,21 +48,27 @@ void MedianFilterNodelet::connectCb()
   boost::lock_guard<boost::mutex> lock(connect_mutex_);
   if (pub_filtered_image_.getNumSubscribers() == 0)
   {
-    ROS_INFO("unsuscribed!");
+    NODELET_INFO("Stopping median filter...");
     sub_depth_.shutdown();
   }
   else if (!sub_depth_)
   {
-    ROS_INFO("Suscribed!");
-    sub_depth_ = nh_.subscribe<sensor_msgs::Image>(
-        depth_image_topic_, 1,
-        boost::bind(&MedianFilterNodelet::depthCb, this, _1));
+    NODELET_INFO("Running median filter...");
+    image_transport::TransportHints hints("raw", ros::TransportHints(),
+                                          getPrivateNodeHandle());
+    sub_depth_ =
+        it_->subscribeCamera(depth_image_topic_, queue_size_,
+                             &MedianFilterNodelet::depthCb, this, hints);
   }
 }
 
-void MedianFilterNodelet::depthCb(const sensor_msgs::ImageConstPtr& depth_msg)
+void MedianFilterNodelet::depthCb(
+    const sensor_msgs::ImageConstPtr& depth_msg,
+    const sensor_msgs::CameraInfoConstPtr& info_msg)
 {
+  // ROS_INFO("HOLA");
   cv_bridge::CvImagePtr cv_ptr;
+  sensor_msgs::CameraInfo cam_info = *info_msg;
 
   try
   {
@@ -67,7 +76,7 @@ void MedianFilterNodelet::depthCb(const sensor_msgs::ImageConstPtr& depth_msg)
   }
   catch (cv_bridge::Exception& e)
   {
-    ROS_ERROR("cv_bridge exception: %s", e.what());
+    NODELET_ERROR("cv_bridge exception: %s", e.what());
   }
 
   // Check if opencl is available
@@ -91,7 +100,8 @@ void MedianFilterNodelet::depthCb(const sensor_msgs::ImageConstPtr& depth_msg)
   cvi.image = cv_ptr->image;
   cvi.toImageMsg(*current_frame_);
 
-  pub_filtered_image_.publish(current_frame_);
+  // pub_filtered_image_.publish(current_frame_);
+  pub_filtered_image_.publish(*current_frame_, cam_info, ros::Time::now());
 }
 
 } // namespace pses_kinect_utilities

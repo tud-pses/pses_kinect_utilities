@@ -21,7 +21,7 @@ typedef struct
   cl_uint invalid_depth;
   cl_float max_depth;
   cl_float NaN;
-} meta_data;
+} MetaData;
 
 typedef struct
 {
@@ -29,15 +29,15 @@ typedef struct
   cl_float cy;
   cl_float fx;
   cl_float fy;
-} transform;
+} Transform;
 
 class DepthImageToPCL
 {
 public:
   DepthImageToPCL();
-  DepthImageToPCL(const meta_data& md, const transform& tf);
-  void setMetaData(const meta_data& md);
-  void setTFData(const transform& tf);
+  DepthImageToPCL(const MetaData& md, const Transform& tf);
+  void setMetaData(const MetaData& md);
+  void setTFData(const Transform& tf);
   void initCloud();
   void init_CL(const std::string& kernel_file);
   void program_kernel(const std::string& kernel_function);
@@ -59,8 +59,8 @@ private:
   bool kernel_init;
   bool buffer_init;
 
-  meta_data md;
-  transform tf;
+  MetaData md;
+  Transform tf;
 
   void fill_buffer(const unsigned char* image);
   void read_buffer();

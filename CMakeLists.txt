@@ -16,6 +16,9 @@ find_package(catkin REQUIRED COMPONENTS
   dynamic_reconfigure
   image_geometry
   nodelet
+  tf2
+  tf2_ros
+  tf2_sensor_msgs
 )
 
 find_package(OpenCV)
@@ -23,6 +26,10 @@ find_package(Boost REQUIRED)
 find_package(OpenCL REQUIRED)
 include_directories(${OpenCL_INCLUDE_DIRS})
 link_directories(${OpenCL_LIBRARY})
+
+generate_dynamic_reconfigure_options(
+  cfg/VoxelGridFilter.cfg
+)
 
 catkin_package(
     INCLUDE_DIRS include
@@ -43,12 +50,15 @@ add_library(${PROJECT_NAME}
   src/ocl_library_wrapper.cpp
   src/nodelets/median_filter.cpp
   src/nodelets/point_cloud_xyz.cpp
+  src/nodelets/voxel_grid_filter.cpp
+  src/nodelets/point_cloud_to_laserscan.cpp
   )
 
 
+add_dependencies(${PROJECT_NAME} ${PROJECT_NAME}_gencfg)
+
 ## Specify libraries to link a library or executable target against
-#target_link_libraries(filter_lib ${catkin_LIBRARIES} ${opencv_LIBRARIES} ${PCL_LIBRARIES} ${OpenCL_LIBRARY})
-target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES} ${OpenCV_LIBRARIES})
+target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES} ${opencv_LIBRARIES} ${PCL_LIBRARIES} ${OpenCL_LIBRARY})
 
 #############
 ## Install ##

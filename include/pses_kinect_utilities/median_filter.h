@@ -12,23 +12,24 @@ namespace pses_kinect_utilities
 
 class MedianFilterNodelet : public nodelet::Nodelet
 {
-private:
+//private:
   int queue_size_;
   int kernel_size_;
   std::string depth_image_topic_;
   std::string output_topic_;
   sensor_msgs::Image::Ptr current_frame_;
-  ros::Subscriber sub_depth_;
-  ros::NodeHandle nh_;
+  // Subscriptions
+  boost::shared_ptr<image_transport::ImageTransport> it_;
+  image_transport::CameraSubscriber sub_depth_;
   // Publications
   boost::mutex connect_mutex_;
-  ros::Publisher pub_filtered_image_;
+  image_transport::CameraPublisher pub_filtered_image_;
 
   virtual void onInit();
 
   void connectCb();
 
-  void depthCb(const sensor_msgs::ImageConstPtr& depth_msg);
+  void depthCb(const sensor_msgs::ImageConstPtr& depth_msg, const sensor_msgs::CameraInfoConstPtr& info_msg);
 };
 } // namespace pses_kinect_utilities
 

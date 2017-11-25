@@ -7,7 +7,7 @@ typedef struct
   unsigned int invalid_depth;
   float max_depth;
   float NaN;
-} meta_data;
+} MetaData;
 
 typedef struct
 {
@@ -15,7 +15,7 @@ typedef struct
   float cy;
   float fx;
   float fy;
-} transform;
+} Transform;
 
 typedef struct
 {
@@ -32,7 +32,7 @@ typedef struct
 #define invalid_depth(d, inv) (d==inv)
 
 void kernel depth_to_pcl(global const unsigned short* img, global pixel* pcl,
-                         const meta_data md, const transform tf)
+                         const MetaData md, const Transform tf)
 {
   int workgroup, n_groups, job_size, start, stop;
   float z;

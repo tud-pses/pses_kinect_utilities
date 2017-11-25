@@ -12,6 +12,9 @@
 #include <string>
 #include <sstream>
 
+namespace pses_kinect_utilities
+{
+
 typedef std::shared_ptr<cl::Device> device_ptr;
 typedef std::shared_ptr<cl::Context> context_ptr;
 typedef std::shared_ptr<cl::Program> program_ptr;
@@ -69,23 +72,33 @@ buffer_ptr create_ocl_buffer(context_ptr context, unsigned int n_elements,
 }
 
 template <typename T>
-void write_ocl_buffer(queue_ptr queue, buffer_ptr buffer, std::vector<T>& array){
-  queue->enqueueWriteBuffer(*buffer, CL_TRUE, 0, sizeof(T)*array.size(), array.data());
+void write_ocl_buffer(queue_ptr queue, buffer_ptr buffer, std::vector<T>& array)
+{
+  queue->enqueueWriteBuffer(*buffer, CL_TRUE, 0, sizeof(T) * array.size(),
+                            array.data());
 }
 
 template <typename T>
-void write_ocl_buffer(queue_ptr queue, buffer_ptr buffer, const unsigned int size, const T* array){
-  queue->enqueueWriteBuffer(*buffer, CL_TRUE, 0, sizeof(T)*size, array);
+void write_ocl_buffer(queue_ptr queue, buffer_ptr buffer,
+                      const unsigned int size, const T* array)
+{
+  queue->enqueueWriteBuffer(*buffer, CL_TRUE, 0, sizeof(T) * size, array);
 }
 
 template <typename T>
-void read_ocl_buffer(queue_ptr queue, buffer_ptr buffer, std::vector<T>& array){
-  queue->enqueueReadBuffer(*buffer, CL_TRUE, 0, sizeof(T)*array.size(), array.data());
+void read_ocl_buffer(queue_ptr queue, buffer_ptr buffer, std::vector<T>& array)
+{
+  queue->enqueueReadBuffer(*buffer, CL_TRUE, 0, sizeof(T) * array.size(),
+                           array.data());
 }
 
 template <typename T>
-void read_ocl_buffer(queue_ptr queue, buffer_ptr buffer, const unsigned int size, T* array){
-  queue->enqueueReadBuffer(*buffer, CL_TRUE, 0, sizeof(T)*size, array);
+void read_ocl_buffer(queue_ptr queue, buffer_ptr buffer,
+                     const unsigned int size, T* array)
+{
+  queue->enqueueReadBuffer(*buffer, CL_TRUE, 0, sizeof(T) * size, array);
 }
+
+} // namespace pses_kinect_utilities
 
 #endif // OCL_LIBRARY_WRAPPER_H

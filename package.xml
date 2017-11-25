@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package>
   <name>pses_kinect_utilities</name>
-  <version>0.1.4</version>
+  <version>0.2.0</version>
   <description>The kinect_utilities package</description>
 
   <!-- One maintainer tag required, multiple allowed, one person per tag --> 
@@ -42,22 +42,26 @@
   <!--   <test_depend>gtest</test_depend> -->
   <buildtool_depend>catkin</buildtool_depend>
   <build_depend>cv_bridge</build_depend>
-  <build_depend>OpenCV</build_depend>
   <build_depend>roscpp</build_depend>
   <build_depend>sensor_msgs</build_depend>
   <build_depend>pcl_ros</build_depend>
   <build_depend>image_transport</build_depend>
   <build_depend>dynamic_reconfigure</build_depend>
   <build_depend>nodelet</build_depend>
+  <build_depend>tf2</build_depend>
+  <build_depend>tf2_ros</build_depend>
+  <build_depend>tf2_sensor_msgs</build_depend>
   <run_depend>image_transport</run_depend>
   <run_depend>pcl_ros</run_depend>
   <run_depend>cv_bridge</run_depend>
-  <run_depend>OpenCV</run_depend>
   <run_depend>roscpp</run_depend>
   <run_depend>depth_image_proc</run_depend>
   <run_depend>sensor_msgs</run_depend>
   <run_depend>dynamic_reconfigure</run_depend>
   <run_depend>nodelet</run_depend>
+  <run_depend>tf2</run_depend>
+  <run_depend>tf2_ros</run_depend>
+  <run_depend>tf2_sensor_msgs</run_depend>
 
 
   <!-- The export tag contains other, unspecified, tags -->
