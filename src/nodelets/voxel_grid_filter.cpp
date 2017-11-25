@@ -24,7 +24,7 @@ void VoxelGridFilterNodelet::onInit()
   // Init dynamic reconfigure
   reconfigureServer = boost::make_shared <dynamic_reconfigure::Server<VoxelGridFilterConfig>> (private_nh);
   dynamic_reconfigure::Server<VoxelGridFilterConfig>::CallbackType f;
-  f = boost::bind(&VoxelGridFilterNodelet::dynReconfCallback, this, _1, _2);
+  f = boost::bind(&VoxelGridFilterNodelet::dynReconfCb, this, _1, _2);
   reconfigureServer->setCallback(f);
 
   filtered_cloud_.reset(new PointCloud);
@@ -32,10 +32,6 @@ void VoxelGridFilterNodelet::onInit()
   // Read parameters
   private_nh.param("queue_size", queue_size_, 1);
   private_nh.param<std::string>("tf_frame", tf_frame_, "kinect2_link");
-  private_nh.param<std::string>("output_topic", output_topic_,
-                                "/kinect_utilities/points_filtered");
-  private_nh.param<std::string>("point_cloud_topic", cloud_topic_,
-                                "/kinect_utilities/points");
 
   // Monitor whether anyone is subscribed to the output
   ros::SubscriberStatusCallback connect_cb =
@@ -43,7 +39,7 @@ void VoxelGridFilterNodelet::onInit()
   // Make sure we don't enter connectCb() between advertising and assigning to
   boost::lock_guard<boost::mutex> lock(connect_mutex_);
   pub_cloud_ =
-      nh_.advertise<PointCloud>(output_topic_, 1, connect_cb, connect_cb);
+      nh_.advertise<PointCloud>("cloud_out", 1, connect_cb, connect_cb);
 }
 
 void VoxelGridFilterNodelet::connectCb()
@@ -58,7 +54,7 @@ void VoxelGridFilterNodelet::connectCb()
   {
     NODELET_INFO("Running voxel grid filter...");
     sub_cloud_ = nh_.subscribe<PointCloud>(
-        cloud_topic_, queue_size_,
+        "cloud_in", queue_size_,
         boost::bind(&VoxelGridFilterNodelet::pointCloudCb, this, _1));
   }
 }
@@ -80,7 +76,7 @@ void VoxelGridFilterNodelet::pointCloudCb(const PointCloud::ConstPtr& cloud_msg)
   pub_cloud_.publish(filtered_cloud_);
 }
 
-void VoxelGridFilterNodelet::dynReconfCallback(
+void VoxelGridFilterNodelet::dynReconfCb(
     VoxelGridFilterConfig& inputConfig, uint32_t level)
 {
   config_ = inputConfig;

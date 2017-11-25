@@ -6,18 +6,19 @@
 #include <sensor_msgs/Image.h>
 #include <boost/thread.hpp>
 #include <ros/ros.h>
+#include <pses_kinect_utilities/MedianFilterConfig.h>
+#include <dynamic_reconfigure/server.h>
 
 namespace pses_kinect_utilities
 {
 
 class MedianFilterNodelet : public nodelet::Nodelet
 {
-//private:
+private:
   int queue_size_;
-  int kernel_size_;
-  std::string depth_image_topic_;
-  std::string output_topic_;
+  MedianFilterConfig config_;
   sensor_msgs::Image::Ptr current_frame_;
+  boost::shared_ptr<dynamic_reconfigure::Server<MedianFilterConfig>> reconfigureServer;
   // Subscriptions
   boost::shared_ptr<image_transport::ImageTransport> it_;
   image_transport::CameraSubscriber sub_depth_;
@@ -29,7 +30,10 @@ class MedianFilterNodelet : public nodelet::Nodelet
 
   void connectCb();
 
-  void depthCb(const sensor_msgs::ImageConstPtr& depth_msg, const sensor_msgs::CameraInfoConstPtr& info_msg);
+  void depthCb(const sensor_msgs::ImageConstPtr& depth_msg,
+               const sensor_msgs::CameraInfoConstPtr& info_msg);
+
+  void dynReconfCb(MedianFilterConfig& inputConfig, uint32_t level);
 };
 } // namespace pses_kinect_utilities
 

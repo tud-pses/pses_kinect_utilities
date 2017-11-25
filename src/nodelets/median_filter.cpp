@@ -19,16 +19,20 @@ void MedianFilterNodelet::onInit()
 
   ros::NodeHandle& private_nh = getPrivateNodeHandle();
   ros::NodeHandle& nh = getNodeHandle();
+
+  // Init dynamic reconfigure
+  reconfigureServer =
+      boost::make_shared<dynamic_reconfigure::Server<MedianFilterConfig>>(
+          private_nh);
+  dynamic_reconfigure::Server<MedianFilterConfig>::CallbackType f;
+  f = boost::bind(&MedianFilterNodelet::dynReconfCb, this, _1, _2);
+  reconfigureServer->setCallback(f);
+
   current_frame_.reset(new sensor_msgs::Image);
   it_.reset(new image_transport::ImageTransport(nh));
 
   // Read parameters
   private_nh.param("queue_size", queue_size_, 1);
-  private_nh.param("kernel_size", kernel_size_, 5);
-  private_nh.param<std::string>("depth_image_topic", depth_image_topic_,
-                                "/kinect2/sd/image_depth_rect");
-  private_nh.param<std::string>("output_topic", output_topic_,
-                                "/kinect_utilities/depth_image");
 
   // Monitor whether anyone is subscribed to the output image or to the camera
   // info
@@ -38,9 +42,8 @@ void MedianFilterNodelet::onInit()
       boost::bind(&MedianFilterNodelet::connectCb, this);
   // Make sure we don't enter connectCb() between advertising and assigning to
   boost::lock_guard<boost::mutex> lock(connect_mutex_);
-  pub_filtered_image_ =
-      it_->advertiseCamera(output_topic_, 1, connect_cb, connect_cb,
-                           connect_info_cb, connect_info_cb);
+  pub_filtered_image_ = it_->advertiseCamera(
+      "image_out", 1, connect_cb, connect_cb, connect_info_cb, connect_info_cb);
 }
 
 void MedianFilterNodelet::connectCb()
@@ -56,9 +59,8 @@ void MedianFilterNodelet::connectCb()
     NODELET_INFO("Running median filter...");
     image_transport::TransportHints hints("raw", ros::TransportHints(),
                                           getPrivateNodeHandle());
-    sub_depth_ =
-        it_->subscribeCamera(depth_image_topic_, queue_size_,
-                             &MedianFilterNodelet::depthCb, this, hints);
+    sub_depth_ = it_->subscribeCamera(
+        "image_in", queue_size_, &MedianFilterNodelet::depthCb, this, hints);
   }
 }
 
@@ -66,7 +68,6 @@ void MedianFilterNodelet::depthCb(
     const sensor_msgs::ImageConstPtr& depth_msg,
     const sensor_msgs::CameraInfoConstPtr& info_msg)
 {
-  // ROS_INFO("HOLA");
   cv_bridge::CvImagePtr cv_ptr;
   sensor_msgs::CameraInfo cam_info = *info_msg;
 
@@ -84,13 +85,14 @@ void MedianFilterNodelet::depthCb(
   {
     // Apply a median filter using the OpenCL libraries of OpenCV
     cv::medianBlur(cv_ptr->image.getUMat(cv::ACCESS_READ),
-                   cv_ptr->image.getUMat(cv::ACCESS_WRITE), kernel_size_);
+                   cv_ptr->image.getUMat(cv::ACCESS_WRITE),
+                   config_.kernel_size);
   }
 
   else // CPU variant
   {
     // Apply a median filter using OpenCV
-    cv::medianBlur(cv_ptr->image, cv_ptr->image, kernel_size_);
+    cv::medianBlur(cv_ptr->image, cv_ptr->image, config_.kernel_size);
   }
 
   // Convert the data back to a ROS Image and store it in procImg
@@ -100,8 +102,16 @@ void MedianFilterNodelet::depthCb(
   cvi.image = cv_ptr->image;
   cvi.toImageMsg(*current_frame_);
 
-  // pub_filtered_image_.publish(current_frame_);
   pub_filtered_image_.publish(*current_frame_, cam_info, ros::Time::now());
+}
+
+void MedianFilterNodelet::dynReconfCb(MedianFilterConfig& inputConfig,
+                                      uint32_t level)
+{
+  config_ = inputConfig;
+  if (config_.kernel_size % 2 == 0)
+    config_.kernel_size += 1;
+  NODELET_INFO_STREAM("Reconfigured median filter params");
 }
 
 } // namespace pses_kinect_utilities

@@ -22,9 +22,6 @@ class PointCloudXYZNodelet : public nodelet::Nodelet
 {
 private:
   int queue_size_;
-  std::string depth_image_topic_;
-  std::string output_topic_;
-  std::string camera_info_topic_;
   std::string tf_frame_;
   std::string cl_file_path_;
   PointCloudMsg::Ptr current_cloud_;

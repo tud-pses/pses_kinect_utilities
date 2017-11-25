@@ -29,6 +29,7 @@ link_directories(${OpenCL_LIBRARY})
 
 generate_dynamic_reconfigure_options(
   cfg/VoxelGridFilter.cfg
+  cfg/MedianFilter.cfg
 )
 
 catkin_package(

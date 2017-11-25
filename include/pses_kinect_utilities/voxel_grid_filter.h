@@ -18,8 +18,6 @@ class VoxelGridFilterNodelet : public nodelet::Nodelet
 private:
   ros::NodeHandle nh_;
   int queue_size_;
-  std::string cloud_topic_;
-  std::string output_topic_;
   std::string tf_frame_;
   PointCloud::Ptr filtered_cloud_;
   VoxelGridFilterConfig config_;
@@ -36,7 +34,7 @@ private:
 
   void pointCloudCb(const PointCloud::ConstPtr& cloud_msg);
 
-  void dynReconfCallback(VoxelGridFilterConfig& inputConfig, uint32_t level);
+  void dynReconfCb(VoxelGridFilterConfig& inputConfig, uint32_t level);
 };
 }
 

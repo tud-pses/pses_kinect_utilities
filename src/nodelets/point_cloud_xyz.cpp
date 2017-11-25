@@ -30,12 +30,6 @@ void PointCloudXYZNodelet::onInit()
   // Read parameters
   private_nh.param("queue_size", queue_size_, 1);
   private_nh.param<std::string>("tf_frame", tf_frame_, "kinect2_link");
-  private_nh.param<std::string>("output_topic", output_topic_,
-                                "/kinect_utilities/points");
-  private_nh.param<std::string>("camera_info_topic", camera_info_topic_,
-                                "/kinect_utilities/camera_info");
-  private_nh.param<std::string>("depth_image_topic", depth_image_topic_,
-                                "/kinect_utilities/depth_image");
   private_nh.param<std::string>("cl_file_path", cl_file_path_,
                                 ros::package::getPath("pses_kinect_utilities") +
                                     "/ocl_kernel/ocl_kernel.cl");
@@ -46,7 +40,7 @@ void PointCloudXYZNodelet::onInit()
   // Make sure we don't enter connectCb() between advertising and assigning to
   boost::lock_guard<boost::mutex> lock(connect_mutex_);
   pub_cloud_ =
-      nh.advertise<PointCloud>(output_topic_, 1, connect_cb, connect_cb);
+      nh.advertise<PointCloud>("cloud_out", 1, connect_cb, connect_cb);
 }
 
 void PointCloudXYZNodelet::connectCb()
@@ -63,7 +57,7 @@ void PointCloudXYZNodelet::connectCb()
     image_transport::TransportHints hints("raw", ros::TransportHints(),
                                           getPrivateNodeHandle());
     sub_depth_ =
-        it_->subscribeCamera(depth_image_topic_, queue_size_,
+        it_->subscribeCamera("depth_in", queue_size_,
                              &PointCloudXYZNodelet::depthCb, this, hints);
   }
 }
