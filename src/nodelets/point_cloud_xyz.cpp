@@ -39,8 +39,7 @@ void PointCloudXYZNodelet::onInit()
       boost::bind(&PointCloudXYZNodelet::connectCb, this);
   // Make sure we don't enter connectCb() between advertising and assigning to
   boost::lock_guard<boost::mutex> lock(connect_mutex_);
-  pub_cloud_ =
-      nh.advertise<PointCloud>("cloud_out", 1, connect_cb, connect_cb);
+  pub_cloud_ = nh.advertise<PointCloud>("cloud_out", 1, connect_cb, connect_cb);
 }
 
 void PointCloudXYZNodelet::connectCb()
@@ -56,9 +55,8 @@ void PointCloudXYZNodelet::connectCb()
     NODELET_INFO("Running conversion from depth image to XYZ pointcloud...");
     image_transport::TransportHints hints("raw", ros::TransportHints(),
                                           getPrivateNodeHandle());
-    sub_depth_ =
-        it_->subscribeCamera("depth_in", queue_size_,
-                             &PointCloudXYZNodelet::depthCb, this, hints);
+    sub_depth_ = it_->subscribeCamera(
+        "depth_in", queue_size_, &PointCloudXYZNodelet::depthCb, this, hints);
   }
 }
 
@@ -104,7 +102,8 @@ void PointCloudXYZNodelet::depthCb(
       try
       {
         pcl_conversion_->init_CL(cl_file_path_);
-        NODELET_INFO_STREAM("Loading opencl kernel from path: " << cl_file_path_);
+        NODELET_INFO_STREAM(
+            "Loading opencl kernel from path: " << cl_file_path_);
         pcl_conversion_->program_kernel("depth_to_pcl");
         pcl_conversion_->init_buffers();
       }
@@ -115,35 +114,27 @@ void PointCloudXYZNodelet::depthCb(
       }
     }
 
-    current_cloud_->header = depth_msg->header;
-    current_cloud_->is_dense = false;
-    current_cloud_->is_bigendian = false;
-    current_cloud_->height = depth_msg->height;
-    current_cloud_->width = depth_msg->width;
-    sensor_msgs::PointCloud2Modifier pcd_mod(*current_cloud_);
-    pcd_mod.setPointCloud2FieldsByString(1, "xyz");
-
     try
     {
       PointCloudPtr pc = pcl_conversion_->convert_to_pcl(depth_msg);
-      pcl::toROSMsg(*pc, *current_cloud_);
+      pc->is_dense = false;
+      pc->height = depth_msg->height;
+      pc->width = depth_msg->width;
+      pc->header.frame_id = tf_frame_;
+      pub_cloud_.publish(pc);
     }
     catch (std::exception& e)
     {
       NODELET_ERROR_STREAM("An error occured during depth to pcl conversion! "
                            << e.what());
     }
-
-    current_cloud_->header.frame_id = tf_frame_;
-    current_cloud_->is_dense = false;
-    pub_cloud_.publish(current_cloud_);
   }
 
-  // else // CPU variant
-  //{
-  //
-  // TODO
-  //}
+  /* else // CPU variant
+  {
+
+   TODO
+  } */
 }
 
 } // namespace pses_kinect_utilities

@@ -59,8 +59,7 @@ void DepthImageToPCL::init_buffers()
   buffer_init = true;
 }
 
-PointCloudPtr
-DepthImageToPCL::convert_to_pcl(const sensor_msgs::Image::ConstPtr img_in)
+PointCloudPtr DepthImageToPCL::convert_to_pcl(const sensor_msgs::Image::ConstPtr img_in)
 {
   if (!cl_init || !kernel_init || !buffer_init)
     throw std::runtime_error("Cl components, program kernel or buffers have "
@@ -70,7 +69,7 @@ DepthImageToPCL::convert_to_pcl(const sensor_msgs::Image::ConstPtr img_in)
                               cl::NDRange(md.n_pixels / 10), cl::NullRange);
   queue->finish();
   read_buffer();
-  return std::make_shared<PointCloud>(cloud);
+  return cloud.makeShared();
 }
 
 void DepthImageToPCL::fill_buffer(const unsigned char* image)

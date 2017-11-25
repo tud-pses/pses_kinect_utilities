@@ -7,7 +7,7 @@
 #include <sensor_msgs/Image.h>
 
 typedef pcl::PointCloud<pcl::PointXYZ> PointCloud;
-typedef std::shared_ptr<PointCloud> PointCloudPtr;
+typedef PointCloud::Ptr PointCloudPtr;
 
 namespace pses_kinect_utilities
 {
