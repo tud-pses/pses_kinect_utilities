@@ -4,7 +4,7 @@ This ROS-package provides some utilities to cope with the noisy and dense data o
 
 ### Prerequisites
 
-This project was build with ROS Kinetic but should work on older ROS versions as well. In addition to that, this project depends on the ROS packages **[cv_bridge](http://wiki.ros.org/cv_bridge)**, **[pcl_ros](http://wiki.ros.org/pcl_ros)** and **[tf2](http://wiki.ros.org/tf2)**. You will need to install them, if they are not already installed in your system. More about that in a moment.
+This project was build with ROS Kinetic but should work on older ROS versions as well. In addition to that, this project depends on the ROS packages **[cv_bridge](http://wiki.ros.org/cv_bridge)**, **[pcl_ros](http://wiki.ros.org/pcl_ros)** and **[tf2_sensor_msgs](http://wiki.ros.org/tf2_sensor_msgs)**. You will need to install them, if they are not already installed in your system. More about that in a moment.
 
 
 ### Installing
