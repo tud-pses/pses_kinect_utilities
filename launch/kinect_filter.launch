@@ -1,37 +1,40 @@
 <?xml version="1.0" encoding="utf-8"?>
 <launch>
-
   <!-- Arguments -->
+    <!-- Note: The current argument settings register all the pses_kinect_utilities nodelets to the same nodelet manager of the kinect2_bridge,
+        avoiding copies of images and therefore improving the overall performance.
+        BUT if you are playing a rosbag you have to set the parameter start_manager to "true" -->
   <arg name="nodelet_manager_name" default="kinect2"/>
   <arg name="start_manager"     default="false"/>
+  <arg name="respawn_enabled"   default="false"/>
   <!-- end argument list -->
 
-  <node pkg="nodelet" type="nodelet" name="$(arg nodelet_manager_name)" args="manager"
+    <node pkg="nodelet" type="nodelet" name="$(arg nodelet_manager_name)" args="manager"
         if="$(arg start_manager)" output="screen"/>
 
-  <node pkg="pses_kinect_filter" type="kinect_filter" name="kinect_filter" output="screen">
-	<param name="depth_image_topic" type="str" value="/kinect2/sd/image_depth_rect"/>
-	<param name="output_depth_image_topic" type="str" value="/kinect_filter/depth_image"/>
-	<param name="camera_info_topic" type="str" value="/kinect2/sd/camera_info"/>
-        <param name="tf_frame" type="str" value="kinect2_link"/>
-  </node>
+    <node pkg="nodelet" type="nodelet" name="kinect2_median_filter"
+        args="load pses_kinect_utilities/median_filter $(arg nodelet_manager_name)" respawn="$(arg respawn_enabled)" output="screen">
+        <remap from="image_in" to="kinect2/sd/image_depth_rect"/>
+        <remap from="image_out" to="kinect_utilities/depth_image_filtered"/>
+    </node>
 
-  <node pkg="nodelet" type="nodelet" name="kinect2_points"
-        args="load depth_image_proc/point_cloud_xyz $(arg nodelet_manager_name)" respawn="true" output="screen">
-    <remap from="image_rect"        to="kinect_filter/depth_image"/>
-    <remap from="camera_info"       to="kinect_filter/camera_info"/>
-    <remap from="points"            to="kinect_filter/points"/>
-  </node>
+    <node pkg="nodelet" type="nodelet" name="kinect2_point_cloud_xyz"
+    args="load pses_kinect_utilities/point_cloud_xyz $(arg nodelet_manager_name)" respawn="$(arg respawn_enabled)" output="screen">
+      <remap from="depth_in" to="kinect_utilities/depth_image_filtered"/>
+      <remap from="cloud_out" to="kinect_utilities/pointcloud"/>
+    </node>
 
-<!-- Uncomment this section if you want to get a laserscan from the filtered point cloud. The default topic for the resulting laserscan is /kinect_filter/scan
+    <node pkg="nodelet" type="nodelet" name="kinect2_voxel_grid_filter"
+    args="load pses_kinect_utilities/voxel_grid_filter $(arg nodelet_manager_name)" respawn="$(arg respawn_enabled)" output="screen">
+      <remap from="cloud_in" to="kinect_utilities/pointcloud"/>
+      <remap from="cloud_out" to="kinect_utilities/pointcloud_filtered"/>
+    </node>
 
-	 <node pkg="tf" type="static_transform_publisher" name="tf_kinect_publisher" args="0 0 0 0 -1.570796 1.570796 kinect2_link base_link 100"/>
-
-	<node pkg="nodelet" type="nodelet" name="pointcloud_to_laserscan" args="load pointcloud_to_laserscan/pointcloud_to_laserscan_nodelet $(arg nodelet_manager_name)">
-
-	<remap from="cloud_in" to="kinect_filter/points_filtered"/>
-	<remap from="scan" to="kinect_filter/scan"/>
-	<rosparam>
+    <node pkg="tf" type="static_transform_publisher" name="tf_kinect_publisher" args="0 0 0 0 -1.570796 1.570796 kinect2_link base_link 100"/>
+    <node pkg="nodelet" type="nodelet" name="pointcloud_to_laserscan" args="load pses_kinect_utilities/pointcloud_to_laserscan $(arg nodelet_manager_name)" respawn="$(arg respawn_enabled)">
+        <remap from="cloud_in" to="kinect_utilities/pointcloud_filtered"/>
+        <remap from="scan" to="scan"/>
+    <rosparam>
       target_frame: base_link
       transform_tolerance: 0.01
       min_height: 0.0
@@ -46,5 +49,5 @@
       concurrency_level: 4
   </rosparam>
   </node>
--->
+
 </launch>

@@ -6,17 +6,20 @@ depends:
 - dynamic_reconfigure
 - catkin
 - roscpp
-- depth_image_proc
+- nodelet
 - sensor_msgs
+- tf2_sensor_msgs
 - image_transport
-- OpenCV
+- depth_image_proc
+- tf2_ros
+- tf2
 - cv_bridge
 - pcl_ros
-description: The kinect_filter package
+description: The kinect_utilities package
 license: GPLv3
 maintainers: Nicolas Acero <aceronicolas@hotmail.com>, Sebastian Ehmes <sebastian.ehmes@gmx.de>
 msgs: []
 package_type: package
-repo_url: https://github.com/tud-pses/pses_kinect_filter
+repo_url: https://github.com/tud-pses/pses_kinect_utilities
 srvs: []
-url: https://github.com/tud-pses/pses_kinect_filter/wiki
+url: https://github.com/tud-pses/pses_kinect_utilities/wiki

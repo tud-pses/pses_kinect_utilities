@@ -1,0 +1,29 @@
+<library path="lib/libpses_kinect_utilities">
+
+    <class name="pses_kinect_utilities/median_filter" type="pses_kinect_utilities::MedianFilterNodelet" base_class_type="nodelet::Nodelet">
+    <description>
+    Nodelet that applies a median filter to a depth image.
+    </description>
+    </class>
+
+    <class name="pses_kinect_utilities/point_cloud_xyz" type="pses_kinect_utilities::PointCloudXYZNodelet" base_class_type="nodelet::Nodelet">
+    <description>
+    Nodelet that transforms a depth image into a XYZ point cloud.
+    </description>
+    </class>
+
+    <class name="pses_kinect_utilities/voxel_grid_filter" type="pses_kinect_utilities::VoxelGridFilterNodelet" base_class_type="nodelet::Nodelet">
+    <description>
+    Nodelet that applies a voxel grid filter to a XYZ point cloud.
+    </description>
+    </class>
+
+    <class name="pses_kinect_utilities/pointcloud_to_laserscan"
+         type="pointcloud_to_laserscan::PointCloudToLaserScanNodelet"
+         base_class_type="nodelet::Nodelet">
+    <description>
+      Nodelet to convert sensor_msgs/PointCloud2 to sensor_msgs/LaserScans. Developed by Paul Bovbel.
+    </description>
+    </class>
+
+</library>

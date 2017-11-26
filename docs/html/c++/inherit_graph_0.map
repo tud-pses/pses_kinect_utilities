@@ -1,0 +1,6 @@
+<map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
+<area shape="rect" id="node2" href="$classpointcloud__to__laserscan_1_1PointCloudToLaserScanNodelet.html" title="pointcloud_to_laserscan\l::PointCloudToLaserScanNodelet" alt="" coords="120,5,336,47"/>
+<area shape="rect" id="node3" href="$classpses__kinect__utilities_1_1MedianFilterNodelet.html" title="Class of the median filter nodelet. " alt="" coords="155,71,301,112"/>
+<area shape="rect" id="node4" href="$classpses__kinect__utilities_1_1PointCloudXYZNodelet.html" title="Class of the PointCloudXYZNodelet nodelet, which converts a depth image into a point cloud containing..." alt="" coords="145,136,311,177"/>
+<area shape="rect" id="node5" href="$classpses__kinect__utilities_1_1VoxelGridFilterNodelet.html" title="Class of the voxel grid filter nodelet. " alt="" coords="147,201,309,243"/>
+</map>
