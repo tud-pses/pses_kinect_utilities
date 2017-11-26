@@ -49,6 +49,7 @@ Here are some screenshots from our toolkit:
 *Depth image after being filtered by a median filter with our package*
 
 ![point_cloud](http://gdurl.com/baz4)
+
 *Point cloud computed and published by our package*
 
 **Note: We implemented our own point cloud conversion, which is performed on the GPU using a opencl kernel. Therefore it is more efficient and faster than the pointcloud delivered by the [kinect2_bridge](https://github.com/tud-pses/iai_kinect2) or the package [depth_image_proc](http://wiki.ros.org/depth_image_proc)**
