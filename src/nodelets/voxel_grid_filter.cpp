@@ -1,3 +1,9 @@
+/**
+ * @file "voxel_grid_filter.cpp"
+ * @brief Nodelet implementation of a voxel grid filter, containing the callback functions.
+ *
+*/
+
 #include <pses_kinect_utilities/voxel_grid_filter.h>
 #include <pluginlib/class_list_macros.h>
 #include <cv_bridge/cv_bridge.h>

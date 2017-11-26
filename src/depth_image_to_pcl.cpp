@@ -1,3 +1,9 @@
+/**
+ * @file "depth_image_to_pcl.cpp"
+ * @brief Nodelet implementation of a depth image to XYZ point cloud conversion, containing the callback functions.
+ *
+*/
+
 #include <pses_kinect_utilities/depth_image_to_pcl.h>
 
 namespace pses_kinect_utilities
@@ -31,7 +37,7 @@ void DepthImageToPCL::init_CL(const std::string& kernel_file)
   kernel_definition = load_kernel_definition(kernel_file);
   program = build_ocl_program(device, context, kernel_definition);
   queue = create_ocl_command_queue(context, device);
-  buffers = std::vector<buffer_ptr>();
+  buffers = std::vector<BufferPtr>();
   cl_init = true;
 }
 

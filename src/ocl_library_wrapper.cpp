@@ -1,9 +1,15 @@
+/**
+ * @file "ocl_library_wrapper.cpp"
+ * @brief Nodelet implementation of a depth image to XYZ point cloud conversion, containing the callback functions.
+ *
+*/
+
 #include <pses_kinect_utilities/ocl_library_wrapper.h>
 
 namespace pses_kinect_utilities
 {
 
-device_ptr get_ocl_default_device()
+DevicePtr get_ocl_default_device()
 {
   // get all platforms (drivers), e.g. NVIDIA
   std::vector<cl::Platform> all_platforms;
@@ -39,7 +45,7 @@ device_ptr get_ocl_default_device()
   return std::make_shared<cl::Device>(default_device);
 }
 
-context_ptr get_ocl_context(device_ptr device)
+ContextPtr get_ocl_context(DevicePtr device)
 {
   // a context is like a "runtime link" to the device and platform;
   // i.e. communication is possible
@@ -47,7 +53,7 @@ context_ptr get_ocl_context(device_ptr device)
   return std::make_shared<cl::Context>(context);
 }
 
-string_ptr load_kernel_definition(const std::string& path)
+StringPtr load_kernel_definition(const std::string& path)
 {
   std::ifstream file(path);
   std::stringstream ss = std::stringstream();
@@ -60,8 +66,8 @@ string_ptr load_kernel_definition(const std::string& path)
   return std::make_shared<std::string>(ss.str());
 }
 
-program_ptr build_ocl_program(device_ptr device, context_ptr context,
-                              string_ptr kernel)
+ProgramPtr build_ocl_program(DevicePtr device, ContextPtr context,
+                              StringPtr kernel)
 {
   // create the program that we want to execute on the device
   cl::Program::Sources sources;
@@ -77,13 +83,13 @@ program_ptr build_ocl_program(device_ptr device, context_ptr context,
   return std::make_shared<cl::Program>(program);
 }
 
-queue_ptr create_ocl_command_queue(context_ptr context, device_ptr device)
+QueuePtr create_ocl_command_queue(ContextPtr context, DevicePtr device)
 {
   cl::CommandQueue queue(*context, *device);
   return std::make_shared<cl::CommandQueue>(queue);
 }
 
-kernel_ptr create_ocl_kernel(program_ptr program,
+KernelPtr create_ocl_kernel(ProgramPtr program,
                              const std::string& program_name)
 {
   cl::Kernel kernel = cl::Kernel(*program, program_name.c_str());

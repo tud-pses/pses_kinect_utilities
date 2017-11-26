@@ -1,3 +1,10 @@
+/**
+ * @file "pses_utilities/ocl_library_wrapper.h"
+ * @brief Wrapper for the opencl library that contains help functions and typedefs
+ * that make the opencl library easier to use.
+ *
+*/
+
 #ifndef OCL_LIBRARY_WRAPPER_H
 #define OCL_LIBRARY_WRAPPER_H
 
@@ -15,34 +22,34 @@
 namespace pses_kinect_utilities
 {
 
-typedef std::shared_ptr<cl::Device> device_ptr;
-typedef std::shared_ptr<cl::Context> context_ptr;
-typedef std::shared_ptr<cl::Program> program_ptr;
-typedef std::shared_ptr<std::string> string_ptr;
-typedef std::shared_ptr<cl::CommandQueue> queue_ptr;
-typedef std::shared_ptr<cl::Kernel> kernel_ptr;
-typedef std::shared_ptr<cl::Buffer> buffer_ptr;
+typedef std::shared_ptr<cl::Device> DevicePtr;
+typedef std::shared_ptr<cl::Context> ContextPtr;
+typedef std::shared_ptr<cl::Program> ProgramPtr;
+typedef std::shared_ptr<std::string> StringPtr;
+typedef std::shared_ptr<cl::CommandQueue> QueuePtr;
+typedef std::shared_ptr<cl::Kernel> KernelPtr;
+typedef std::shared_ptr<cl::Buffer> BufferPtr;
 
 static const int W_ACCESS = 0;
 static const int R_ACCESS = 1;
 static const int RW_ACCESS = 2;
 
-device_ptr get_ocl_default_device();
+DevicePtr get_ocl_default_device();
 
-context_ptr get_ocl_context(device_ptr device);
+ContextPtr get_ocl_context(DevicePtr device);
 
-string_ptr load_kernel_definition(const std::string& path);
+StringPtr load_kernel_definition(const std::string& path);
 
-program_ptr build_ocl_program(device_ptr device, context_ptr context,
-                              string_ptr kernel);
+ProgramPtr build_ocl_program(DevicePtr device, ContextPtr context,
+                              StringPtr kernel);
 
-queue_ptr create_ocl_command_queue(context_ptr context, device_ptr device);
+QueuePtr create_ocl_command_queue(ContextPtr context, DevicePtr device);
 
-kernel_ptr create_ocl_kernel(program_ptr program,
+KernelPtr create_ocl_kernel(ProgramPtr program,
                              const std::string& program_name);
 
 template <typename T>
-buffer_ptr create_ocl_buffer(context_ptr context, unsigned int n_elements,
+BufferPtr create_ocl_buffer(ContextPtr context, unsigned int n_elements,
                              int access_type)
 {
   cl::Buffer buffer;
@@ -72,28 +79,28 @@ buffer_ptr create_ocl_buffer(context_ptr context, unsigned int n_elements,
 }
 
 template <typename T>
-void write_ocl_buffer(queue_ptr queue, buffer_ptr buffer, std::vector<T>& array)
+void write_ocl_buffer(QueuePtr queue, BufferPtr buffer, std::vector<T>& array)
 {
   queue->enqueueWriteBuffer(*buffer, CL_TRUE, 0, sizeof(T) * array.size(),
                             array.data());
 }
 
 template <typename T>
-void write_ocl_buffer(queue_ptr queue, buffer_ptr buffer,
+void write_ocl_buffer(QueuePtr queue, BufferPtr buffer,
                       const unsigned int size, const T* array)
 {
   queue->enqueueWriteBuffer(*buffer, CL_TRUE, 0, sizeof(T) * size, array);
 }
 
 template <typename T>
-void read_ocl_buffer(queue_ptr queue, buffer_ptr buffer, std::vector<T>& array)
+void read_ocl_buffer(QueuePtr queue, BufferPtr buffer, std::vector<T>& array)
 {
   queue->enqueueReadBuffer(*buffer, CL_TRUE, 0, sizeof(T) * array.size(),
                            array.data());
 }
 
 template <typename T>
-void read_ocl_buffer(queue_ptr queue, buffer_ptr buffer,
+void read_ocl_buffer(QueuePtr queue, BufferPtr buffer,
                      const unsigned int size, T* array)
 {
   queue->enqueueReadBuffer(*buffer, CL_TRUE, 0, sizeof(T) * size, array);

@@ -1,3 +1,10 @@
+/**
+ * @file "pses_utilities/depth_image_to_pcl.h"
+ * @brief Contains help functions, the DepthImageToPCL class and some structures that make
+ * the implementation of the PointCloudXYZNodelet nodelet cleaner.
+ *
+*/
+
 #ifndef DEPTH_IMAGE_TO_PCL_H
 #define DEPTH_IMAGE_TO_PCL_H
 
@@ -6,12 +13,31 @@
 #include <pcl/point_types.h>
 #include <sensor_msgs/Image.h>
 
+/**
+ * @typedef pcl::PointCloud<pcl::PointXYZ> PointCloud
+ * @brief Shortcut for a XYZ Point cloud of the pcl library.
+*/
 typedef pcl::PointCloud<pcl::PointXYZ> PointCloud;
+
+/**
+ * @typedef PointCloud::Ptr PointCloudPtr
+ * @brief Shortcut for a pointer of a XYZ Point cloud of the pcl library.
+*/
 typedef PointCloud::Ptr PointCloudPtr;
 
+/**
+ * @namespace pses_kinect_utilities
+ * @brief This namespace is used by the nodelets inside our package pses_kinect_utilities.
+ *
+*/
 namespace pses_kinect_utilities
 {
 
+/**
+ * @struct MetaData depth_image_to_pcl.h
+ * @brief Contains some parameters and metada data of the camera.
+ *
+*/
 typedef struct
 {
   cl_uint width;
@@ -23,14 +49,26 @@ typedef struct
   cl_float NaN;
 } MetaData;
 
+/**
+ * @struct Transform depth_image_to_pcl.h
+ * @brief Contains the camera calibration.
+ *
+*/
 typedef struct
 {
-  cl_float cx;
-  cl_float cy;
-  cl_float fx;
-  cl_float fy;
+  cl_float cx; /**< X coordinate of the principal point. */
+  cl_float cy; /**< y coordinate of the principal point. */
+  cl_float fx; /**< X coordinate of the focal length. */
+  cl_float fy; /**< Y coordinate of the focal length. */
 } Transform;
 
+
+/**
+ * @class DepthImageToPCL depth_image_to_pcl.h
+ * @brief Class that make
+ * the implementation of the PointCloudXYZNodelet nodelet cleaner.
+ *
+*/
 class DepthImageToPCL
 {
 public:
@@ -45,13 +83,13 @@ public:
   PointCloudPtr convert_to_pcl(const sensor_msgs::Image::ConstPtr rawImgPtr);
 
 private:
-  device_ptr device;
-  context_ptr context;
-  program_ptr program;
-  string_ptr kernel_definition;
-  queue_ptr queue;
-  kernel_ptr kernel;
-  std::vector<buffer_ptr> buffers;
+  DevicePtr device;
+  ContextPtr context;
+  ProgramPtr program;
+  StringPtr kernel_definition;
+  QueuePtr queue;
+  KernelPtr kernel;
+  std::vector<BufferPtr> buffers;
 
   PointCloud cloud;
 

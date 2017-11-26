@@ -1,3 +1,9 @@
+/**
+ * @file "point_cloud_xyz.cpp"
+ * @brief Nodelet implementation of a depth image to XYZ point cloud conversion, containing the callback functions.
+ *
+*/
+
 #include <pses_kinect_utilities/point_cloud_xyz.h>
 #include <image_transport/image_transport.h>
 #include <pluginlib/class_list_macros.h>
@@ -78,10 +84,11 @@ void PointCloudXYZNodelet::depthCb(
   // Check if opencl is available
   if (cv::ocl::haveOpenCL())
   {
-
+    // Compile and initialize the opencl kernel
     if (!kernel_ready_)
     {
       kernel_ready_ = true;
+      // Initialize the camera model and compute all necessary factors.
       camera_model_.fromCameraInfo(info_msg);
       MetaData md;
       md.width = (cl_uint)depth_msg->width;
@@ -116,6 +123,7 @@ void PointCloudXYZNodelet::depthCb(
 
     try
     {
+      // Do the actual conversion
       PointCloudPtr pc = pcl_conversion_->convert_to_pcl(depth_msg);
       pc->is_dense = false;
       pc->height = depth_msg->height;
@@ -130,11 +138,11 @@ void PointCloudXYZNodelet::depthCb(
     }
   }
 
-  /* else // CPU variant
+  else // CPU variant
   {
-
-   TODO
-  } */
+   //TODO
+   NODELET_ERROR("GPU has no OpenCL support!");
+  }
 }
 
 } // namespace pses_kinect_utilities

@@ -1,0 +1,7 @@
+<map id="ocl_library_wrapper.h" name="ocl_library_wrapper.h">
+<area shape="rect" id="node2" href="$depth__image__to__pcl_8h.html" title="depth_image_to_pcl.h" alt="" coords="85,80,235,107"/>
+<area shape="rect" id="node6" href="$ocl__library__wrapper_8cpp.html" title="Nodelet implementation of a depth image to XYZ point cloud conversion, containing the callback functi..." alt="" coords="259,80,418,107"/>
+<area shape="rect" id="node3" href="$point__cloud__xyz_8h.html" title="point_cloud_xyz.h" alt="" coords="13,155,139,181"/>
+<area shape="rect" id="node5" href="$depth__image__to__pcl_8cpp.html" title="Nodelet implementation of a depth image to XYZ point cloud conversion, containing the callback functi..." alt="" coords="164,155,327,181"/>
+<area shape="rect" id="node4" href="$point__cloud__xyz_8cpp.html" title="Nodelet implementation of a depth image to XYZ point cloud conversion, containing the callback functi..." alt="" coords="5,229,147,256"/>
+</map>

@@ -1,3 +1,9 @@
+/**
+ * @file "median_filter.cpp"
+ * @brief median filter nodelet implementation, containing the callback functions.
+ *
+*/
+
 #include <pses_kinect_utilities/median_filter.h>
 #include <image_transport/image_transport.h>
 #include <pluginlib/class_list_macros.h>
@@ -34,7 +40,7 @@ void MedianFilterNodelet::onInit()
   // Read parameters
   private_nh.param("queue_size", queue_size_, 1);
 
-  // Monitor whether anyone is subscribed to the output image or to the camera
+  // Monitor whether anyone is subscribed to the output image or to its camera
   // info
   image_transport::SubscriberStatusCallback connect_cb =
       boost::bind(&MedianFilterNodelet::connectCb, this);
@@ -117,8 +123,9 @@ void MedianFilterNodelet::dynReconfCb(MedianFilterConfig& inputConfig,
                                       uint32_t level)
 {
   config_ = inputConfig;
+  // Check if the kernel size is even
   if (config_.kernel_size % 2 == 0)
-    config_.kernel_size += 1;
+    config_.kernel_size += 1; // Enforce an odd kernel size.
   NODELET_INFO_STREAM("Reconfigured median filter params");
 }
 
