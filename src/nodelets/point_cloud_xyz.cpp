@@ -129,6 +129,7 @@ void PointCloudXYZNodelet::depthCb(
       pc->height = depth_msg->height;
       pc->width = depth_msg->width;
       pc->header.frame_id = tf_frame_;
+      pc->header.stamp = depth_msg->header.stamp.toNSec() / 1000ull;
       pub_cloud_.publish(pc);
     }
     catch (std::exception& e)
