@@ -35,7 +35,7 @@
 	 If you want to visualize the laserscan and/or the pointcloud(s) make sure that you select "base_link" as the 
 	 fixed frame on RViz. For more information visit http://wiki.ros.org/tf#static_transform_publisher 
     -->
-    <node pkg="tf" type="static_transform_publisher" name="tf_kinect_publisher" args="0 0 0 0 -1.570796 1.570796 kinect2_link base_link 100"/>
+    <node pkg="tf" type="static_transform_publisher" name="tf_kinect_transform_publisher" args="0 0 0 -1.570796 0 -1.570796 base_link kinect2_link 100"/>
 
     <node pkg="nodelet" type="nodelet" name="pointcloud_to_laserscan" args="load pses_kinect_utilities/pointcloud_to_laserscan $(arg nodelet_manager_name)" respawn="$(arg respawn_enabled)">
         <remap from="cloud_in" to="kinect_utilities/pointcloud_filtered"/>
