@@ -4,8 +4,8 @@
     <!-- Note: The current argument settings register all the pses_kinect_utilities nodelets to the same nodelet manager of the kinect2_bridge,
         avoiding copies of images and therefore improving the overall performance.
         BUT if you are playing a rosbag you have to set the parameter start_manager to "true" -->
-  <arg name="nodelet_manager_name" default="kinect2"/>
-  <arg name="start_manager"     default="false"/>
+  <arg name="nodelet_manager_name" default="kinect2-filter"/>
+  <arg name="start_manager"     default="true"/>
   <arg name="respawn_enabled"   default="false"/>
   <!-- end argument list -->
 
