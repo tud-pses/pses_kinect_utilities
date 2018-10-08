@@ -39,7 +39,7 @@ If you're looking for a documentation of the code, please follow this link:
 ## Screenshots
 
 Here are some screenshots from our toolkit:
-![color image](https://tud-pses.github.io/pses_kinect_utilities/pictures/snapshot-1.jpg)
+![color image](https://tud-pses.github.io/pses_kinect_utilities/pictures/snapshot1.jpg)
 *Original color image delivered by the [kinect2_bridge](https://github.com/tud-pses/iai_kinect2)*
 
 ![depth image](https://tud-pses.github.io/pses_kinect_utilities/pictures/snapshot-2.png)
