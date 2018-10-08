@@ -39,16 +39,16 @@ If you're looking for a documentation of the code, please follow this link:
 ## Screenshots
 
 Here are some screenshots from our toolkit:
-![color image](https://tud-pses.github.io/pses_kinect_utilities/pictures/snapshot1.jpg)
+![color image](https://tud-pses.github.io/pses_kinect_utilities/pictures/snapshot-1.jpg)
 *Original color image delivered by the [kinect2_bridge](https://github.com/tud-pses/iai_kinect2)*
 
-![depth image](https://tud-pses.github.io/pses_kinect_utilities/pictures/snapshot2.png)
+![depth image](https://tud-pses.github.io/pses_kinect_utilities/pictures/snapshot-2.png)
 *Original depth image delivered by the [kinect2_bridge](https://github.com/tud-pses/iai_kinect2)*
 
-![depth_filtered](https://tud-pses.github.io/pses_kinect_utilities/pictures/snapshot3.png)
+![depth_filtered](https://tud-pses.github.io/pses_kinect_utilities/pictures/snapshot-3.png)
 *Depth image after being filtered by a median filter with our package*
 
-![point_cloud](https://tud-pses.github.io/pses_kinect_utilities/pictures/snapshot4.png)
+![point_cloud](https://tud-pses.github.io/pses_kinect_utilities/pictures/snapshot-4.png)
 
 *Point cloud computed and published by our package*
 
