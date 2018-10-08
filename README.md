@@ -54,7 +54,7 @@ Here are some screenshots from our toolkit:
 
 **Note: We implemented our own point cloud conversion, which is performed on the GPU using a opencl kernel. Therefore it is more efficient and faster than the pointcloud delivered by the [kinect2_bridge](https://github.com/tud-pses/iai_kinect2) or the package [depth_image_proc](http://wiki.ros.org/depth_image_proc)**
 
-![point_cloud_filtered](https://tud-pses.github.io/pses_kinect_utilities/pictures/snapshot5.png)
+![point_cloud_filtered](https://tud-pses.github.io/pses_kinect_utilities/pictures/snapshot-5.png)
 *Point cloud after being filtered by a voxel grid filter with our package. The **red points** conform the resulting **laserscan**, which is also provided by our package.*
 
 ## Authors
