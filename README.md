@@ -42,7 +42,7 @@ Here are some screenshots from our toolkit:
 ![color image](https://tud-pses.github.io/pses_kinect_utilities/pictures/snapshot1.jpg)
 *Original color image delivered by the [kinect2_bridge](https://github.com/tud-pses/iai_kinect2)*
 
-![depth image](https://tud-pses.github.io/pses_kinect_utilities/pictures/snapshot2.png)
+![depth image](https://tud-pses.github.io/pses_kinect_utilities/pictures/snapshot2.pn)
 *Original depth image delivered by the [kinect2_bridge](https://github.com/tud-pses/iai_kinect2)*
 
 ![depth_filtered](https://tud-pses.github.io/pses_kinect_utilities/pictures/snapshot3.png)
